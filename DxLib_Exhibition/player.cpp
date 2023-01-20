@@ -60,8 +60,9 @@ void player::update()
 		shotFlag = true;
 		if (prev == 0)
 		{
-			sPosX += 2;
+			sPosY++;
 		}
+
 	}
 }
 
@@ -84,6 +85,11 @@ void player::draw()
 		DrawBox(posX, posY, posX + 20, posY + 20, GetColor(255, 255, 255), true);
 	}
 
+	if (shotFlag == true)
+	{
+		DrawCircle(sPosX, sPosY, 10, GetColor(100, 100, 100), true);
+
+	}
 
 #if true
 
