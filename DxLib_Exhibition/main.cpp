@@ -20,6 +20,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     SetDrawScreen(DX_SCREEN_BACK);
 
     player Player;
+    Player.init();
 
     while (ProcessMessage() == 0)
     {
@@ -28,7 +29,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         //‰æ–Ê‚ÌƒNƒŠƒA
         ClearDrawScreen();
 
-        Player.init();
         Player.update();
         Player.draw();
 

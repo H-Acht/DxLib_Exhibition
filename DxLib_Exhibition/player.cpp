@@ -7,6 +7,11 @@ player::player() :
 	direction(0),
 	shield(0),
 	prev(0),
+	DshotFlag(false),
+	UshotFlag(false),
+	LshotFlag(false),
+	RshotFlag(false),
+	visibleFlag(false),
 	shotFlag(false),
 	sPosX(0),
 	sPosY(0)
@@ -33,14 +38,14 @@ void player::update()
 	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
 	//•ûŒü“ü—Í
-	if (padState & PAD_INPUT_UP)
-	{
-		direction = 1;
-		prev = direction;
-	}
 	if (padState & PAD_INPUT_DOWN)
 	{
 		direction = 0;
+		prev = direction;
+	}
+	if (padState & PAD_INPUT_UP)
+	{
+		direction = 1;
 		prev = direction;
 	}
 	if (padState & PAD_INPUT_LEFT)
@@ -55,14 +60,37 @@ void player::update()
 	}
 
 	//shotŠÖ˜A
-	if (padState & PAD_INPUT_1)
+	if (prev == 0)
 	{
-		shotFlag = true;
-		if (prev == 0)
+		if (padState & PAD_INPUT_1)
 		{
-			sPosY++;
+			shotFlag = true;
+			sPosY += 3;
 		}
-
+	}
+	else if (prev == 1)
+	{
+		if (padState & PAD_INPUT_1)
+		{
+			shotFlag = true;
+			sPosY -= 3;
+		}
+	}
+	else if (prev == 2)
+	{
+		if (padState & PAD_INPUT_1)
+		{
+			shotFlag = true;
+			sPosX -= 3;
+		}
+	}
+	else if (prev == 3)
+	{
+		if (padState & PAD_INPUT_1)
+		{
+			shotFlag = true;
+			sPosX += 3;
+		}
 	}
 }
 
@@ -88,8 +116,8 @@ void player::draw()
 	if (shotFlag == true)
 	{
 		DrawCircle(sPosX, sPosY, 10, GetColor(100, 100, 100), true);
-
 	}
+
 
 #if true
 
