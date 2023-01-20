@@ -62,7 +62,6 @@ void player::update()
 		{
 			sPosY++;
 		}
-
 	}
 }
 
