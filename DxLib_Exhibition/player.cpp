@@ -84,7 +84,6 @@ void player::draw()
 		DrawBox(posX, posY, posX + 20, posY + 20, GetColor(255, 255, 255), true);
 	}
 
-	//DrawCircle(sPosX, sPosY, );
 
 #if true
 
