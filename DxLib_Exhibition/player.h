@@ -13,32 +13,21 @@ public:
 
 private:
 	//プレイヤー位置
-	int posX;
-	int posY;
+	int m_posX;
+	int m_posY;
 
 	//プレイヤーの向いている方向
-	int direction;
-	//盾の向いている方向
-	int shield;
+	int m_direction;
 	//方向を保存
 	int prev;
 
-	//弾の座標
-	int sPosX;
-	int sPosY;
-	//下方向、弾フラグ
-	bool DshotFlag;
-	//上方向、弾フラグ
-	bool UshotFlag;
-	//左方向、弾フラグ
-	bool LshotFlag;
-	//右方向、弾フラグ
-	bool RshotFlag;
+	//pad入力
+	int m_inputX;
+	int m_inputY;
 
-	//存在するか
-	bool visibleFlag;
-
-	bool shotFlag;
-
+	//ワイヤー(shot)
+	int m_shotX;
+	int m_shotY;
+	int m_DshotFlag;
+	bool m_shotFlag;
 };
-

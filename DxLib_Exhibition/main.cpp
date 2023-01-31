@@ -1,6 +1,7 @@
 #include "game.h"
 #include "player.h"
 
+
 //プログラムはWin Mainから始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -31,6 +32,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         Player.update();
         Player.draw();
+
+
+
 
         //裏画面と表画面を切り替える
         ScreenFlip();
