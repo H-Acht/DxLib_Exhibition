@@ -5,14 +5,10 @@
 player::player() :
 	m_posX(0),
 	m_posY(0),
-	m_direction(0),
+	m_dir(0),
 	prev(0),
 	m_inputX(0),
-	m_inputY(0),
-	m_shotX(0),
-	m_shotY(0),
-	m_DshotFlag(0),
-	m_shotFlag(false)
+	m_inputY(0)
 {
 }
 
@@ -25,72 +21,121 @@ void player::init()
 	m_posX = Game::kScreenWidth / 2;
 	m_posY = Game::kScreenHeight / 2;
 
-	m_shotX = Game::kScreenWidth / 2;
-	m_shotY = Game::kScreenHeight / 2;
+	for (int i = 0; i < SHOT; i++)
+	{
+		shotFlag = false;
+		m_shotX = m_posX;
+		m_shotY = m_posY;
+	
+	}
+
+	bool prevShotFlag = false;
+
 }
 
 void player::update()
 {
-	int padState = GetJoypadAnalogInput(&m_inputX, &m_inputY, DX_INPUT_KEY_PAD1);
+	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
-	if (m_inputY == -1000) // 上
+	if (padState & PAD_INPUT_UP)//上
 	{
-		m_direction = 0;
-		prev = m_direction;
+		m_dir = 0;
+		prev = m_dir;
 	}
-	if (m_inputY == 1000) // 下
+	if (padState & PAD_INPUT_DOWN)//下
 	{
-		m_direction = 1;
-		prev = m_direction;
+		m_dir = 1;
+		prev = m_dir;
 	}
-	if (m_inputX == -1000) // 左
+	if (padState & PAD_INPUT_LEFT)//左
 	{
-		m_direction = 2;
-		prev = m_direction;
+		m_dir = 2;
+		prev = m_dir;
 	}
-	if (m_inputX == 1000) // 右
+	if (padState & PAD_INPUT_RIGHT)//右
 	{
-		m_direction = 3;
-		prev = m_direction;
+		m_dir = 3;
+		prev = m_dir;
 	}
-	if (m_inputX > 0 && m_inputX < 1000)
+	if (padState & PAD_INPUT_UP && padState & PAD_INPUT_RIGHT)//右上
 	{
-		if (m_inputY < 0 && m_inputY > -1000) // 右上
-		{
-			m_direction = 4;
-			prev = m_direction;
-		}
-		else if (m_inputY > 0 && m_inputY < 1000) // 右下
-		{
-			m_direction = 5;
-			prev = m_direction;
-		}
+		m_dir = 4;
+		prev = m_dir;
 	}
-	if (m_inputX < 0 && m_inputX > -1000)
+	if (padState & PAD_INPUT_RIGHT && padState & PAD_INPUT_DOWN )//右下
 	{
-		if (m_inputY > 0 && m_inputY < 1000) // 左下
-		{
-			m_direction = 6;
-			prev = m_direction;
-		}
-		else if (m_inputY < 0 && m_inputY > -1000) // 左上
-		{
-			m_direction = 7;
-			prev = m_direction;
-		}
+		m_dir = 5;
+		prev = m_dir;
+	}
+	if (padState & PAD_INPUT_DOWN && padState & PAD_INPUT_LEFT)//左下
+	{
+		m_dir = 6;
+		prev = m_dir;
+	}
+	if (padState & PAD_INPUT_LEFT && padState & PAD_INPUT_UP)//左上
+	{
+		m_dir = 7;
+		prev = m_dir;
 	}
 
-	if (padState & KEY_INPUT_1)
+	if (padState & PAD_INPUT_1)
 	{
-		if (m_shotFlag == false)
-		{		
-			m_shotFlag = true;
+		// 弾iが画面上にでていない場合はその弾を画面に出す
+		if (shotFlag == false)
+		{
+			// 弾iは現時点を持って存在するので、存在状態を保持する変数にtrueを代入する
+			shotFlag = true;
 		}
 	}
-	else
+
+	if (shotFlag == true)
 	{
-		m_shotX += 3;
-		m_shotFlag = false;
+		if (prev == 0)
+		{
+			m_shotY -= 16;
+		}
+		else if (prev == 1)
+		{
+			m_shotY += 16;
+		}
+		else if (prev == 2)
+		{
+			m_shotX -= 16;
+		}
+		else if (prev == 3)
+		{
+			m_shotX += 16;
+		}
+		else if (prev == 4)
+		{
+			m_shotX += 8;
+			m_shotY -= 8;
+		}
+		else if (prev == 5)
+		{
+			m_shotX += 8;
+			m_shotY += 8;
+		}
+		else if (prev == 6)
+		{
+			m_shotX -= 8;
+			m_shotY += 8;
+		}
+		else if (prev == 7)
+		{
+			m_shotX -= 8;
+			m_shotY -= 8;
+		}
+
+		DrawCircle(m_shotX, m_shotY, 10, GetColor(255, 255, 255),true);
+
+		// 画面外に出てしまった場合は存在状態を保持している変数にfalse(存在しない)を代入する
+		if (m_shotY < 0 || m_shotY > 720 || m_shotX < 0 || m_shotX > 1280)
+		{
+			shotFlag = false;
+			m_shotX = m_posX;
+			m_shotY = m_posY;
+		}
 	}
 }
 
@@ -128,17 +173,6 @@ void player::draw()
 	else if (prev == 7)
 	{
 		DrawBox(m_posX, m_posY, m_posX + 20, m_posY + 20, GetColor(125, 125, 125), true);
-	}
-
-	if (m_shotFlag == true)
-	{
-		//DrawCircle(m_shotX, m_shotY, 20, GetColor(255, 255, 255), true);
-
-		DrawString(20, 80, "shotFlag = 0", GetColor(255, 255, 255));
-	}
-	else
-	{
-		DrawString(20, 80, "shotFlag = 1", GetColor(255, 255, 255));
 	}
 
 #endif

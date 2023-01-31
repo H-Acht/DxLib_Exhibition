@@ -1,5 +1,6 @@
 #pragma once
 #include "Game.h"
+#define SHOT 20
 
 class player
 {
@@ -17,7 +18,7 @@ private:
 	int m_posY;
 
 	//プレイヤーの向いている方向
-	int m_direction;
+	int m_dir;
 	//方向を保存
 	int prev;
 
@@ -25,9 +26,9 @@ private:
 	int m_inputX;
 	int m_inputY;
 
-	//ワイヤー(shot)
+	//shot
 	int m_shotX;
 	int m_shotY;
-	int m_DshotFlag;
-	bool m_shotFlag;
+	bool shotFlag;
+
 };
