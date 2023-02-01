@@ -1,6 +1,5 @@
 #pragma once
 #include "Game.h"
-#define SHOT 20
 
 class player
 {

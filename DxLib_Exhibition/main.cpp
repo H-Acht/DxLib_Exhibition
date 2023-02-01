@@ -1,54 +1,58 @@
 #include "game.h"
 #include "player.h"
-
+#include "enemy.h"
 
 //プログラムはWin Mainから始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    //windowモード設定
-    ChangeWindowMode(Game::kWindowMode);
-    //ウィンドウ名設定
-    SetMainWindowText(Game::kTitleText);
-    //画面サイズの設定
-    SetGraphMode(1280, 720, 32);
+	//windowモード設定
+	ChangeWindowMode(Game::kWindowMode);
+	//ウィンドウ名設定
+	SetMainWindowText(Game::kTitleText);
+	//画面サイズの設定
+	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorDepth);
 
-    if (DxLib_Init() == -1)        // ＤＸライブラリ初期化処理
-    {
-        return -1;        // エラーが起きたら直ちに終了
-    }
+	if (DxLib_Init() == -1)        // ＤＸライブラリ初期化処理
+	{
+		return -1;        // エラーが起きたら直ちに終了
+	}
 
-    //ダブルバッファモード
-    SetDrawScreen(DX_SCREEN_BACK);
+	//ダブルバッファモード
+	SetDrawScreen(DX_SCREEN_BACK);
 
-    player Player;
-    Player.init();
+	player Player;
+	enemy Enemy;
 
-    while (ProcessMessage() == 0)
-    {
-        LONGLONG time = GetNowHiPerformanceCount();
-
-        //画面のクリア
-        ClearDrawScreen();
-
-        Player.update();
-        Player.draw();
+	Player.init();
+	Enemy.init();
 
 
+	while (ProcessMessage() == 0)
+	{
+		LONGLONG time = GetNowHiPerformanceCount();
 
+		//画面のクリア
+		ClearDrawScreen();
 
-        //裏画面と表画面を切り替える
-        ScreenFlip();
+		Player.update();
+		Enemy.update();
 
-        //escキーで終了
-        if (CheckHitKey(KEY_INPUT_ESCAPE))   break;
+		Player.draw();
+		Enemy.draw();
 
-        //fpsを60に固定
-        while (GetNowHiPerformanceCount() - time < 16667)
-        {
-        }
-    }
+		//裏画面と表画面を切り替える
+		ScreenFlip();
 
-    DxLib_End();            // ＤＸライブラリ使用の終了処理
+		//escキーで終了
+		if (CheckHitKey(KEY_INPUT_ESCAPE))   break;
 
-    return 0;            // ソフトの終了
+		//fpsを60に固定
+		while (GetNowHiPerformanceCount() - time < 16667)
+		{
+		}
+	}
+
+	DxLib_End();            // ＤＸライブラリ使用の終了処理
+
+	return 0;            // ソフトの終了
 }

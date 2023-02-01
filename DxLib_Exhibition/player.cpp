@@ -1,6 +1,5 @@
 #include "player.h"
 #include "game.h"
-#include <math.h>
 
 player::player() :
 	m_posX(0),
@@ -8,7 +7,10 @@ player::player() :
 	m_dir(0),
 	prev(0),
 	m_inputX(0),
-	m_inputY(0)
+	m_inputY(0),
+	m_shotX(0),
+	m_shotY(0),
+	shotFlag(false)
 {
 }
 
@@ -21,16 +23,11 @@ void player::init()
 	m_posX = Game::kScreenWidth / 2;
 	m_posY = Game::kScreenHeight / 2;
 
-	for (int i = 0; i < SHOT; i++)
-	{
-		shotFlag = false;
-		m_shotX = m_posX;
-		m_shotY = m_posY;
+	shotFlag = false;
+	m_shotX = m_posX;
+	m_shotY = m_posY;
 	
-	}
-
 	bool prevShotFlag = false;
-
 }
 
 void player::update()
@@ -85,6 +82,7 @@ void player::update()
 		{
 			// ’ei‚ÍŒ»Žž“_‚ðŽ‚Á‚Ä‘¶Ý‚·‚é‚Ì‚ÅA‘¶Ýó‘Ô‚ð•ÛŽ‚·‚é•Ï”‚Étrue‚ð‘ã“ü‚·‚é
 			shotFlag = true;
+			
 		}
 	}
 
