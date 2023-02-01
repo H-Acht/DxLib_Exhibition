@@ -30,4 +30,5 @@ private:
 	int m_shotY;
 	bool shotFlag;
 
+	bool moveFlag;
 };
