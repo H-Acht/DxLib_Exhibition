@@ -13,12 +13,17 @@ public:
 	void update(enemy &Enemy);
 	void draw();
 
-	
-private:
 	//プレイヤー位置
 	int m_posX;
 	int m_posY;
+	int m_posR;
 
+	//デバッグ用
+	int m_drawPosX;
+	int m_drawPosY;
+
+	
+private:
 	//プレイヤーの向いている方向
 	int m_dir;
 	//方向を保存
@@ -36,4 +41,5 @@ private:
 	bool shotFlag;
 
 	bool moveFlag;
+
 };

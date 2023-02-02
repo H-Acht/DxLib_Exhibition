@@ -5,6 +5,7 @@
 player::player() :
 	m_posX(0),
 	m_posY(0),
+	m_posR(0),
 	m_dir(0),
 	prev(0),
 	m_inputX(0),
@@ -12,6 +13,8 @@ player::player() :
 	m_sPosX(0),
 	m_sPosY(0),
 	m_sPosR(0),
+	m_drawPosX(0),
+	m_drawPosY(0),
 	shotFlag(false),
 	moveFlag(false)
 {
@@ -23,8 +26,13 @@ player::~player()
 
 void player::init()
 {
-	m_posX = Game::kScreenWidth / 2;
+
+	m_posX = Game::kScreenWidth / 2 ;
 	m_posY = Game::kScreenHeight / 2;
+	m_posR = 10;
+
+	m_drawPosX = m_posX - 10;
+	m_drawPosY = m_posY - 10;
 
 	shotFlag = false;
 	m_sPosX = m_posX;
@@ -84,10 +92,8 @@ void player::update(enemy &Enemy)
 	}
 	if (padState & PAD_INPUT_1)
 	{
-		// 弾iが画面上にでていない場合はその弾を画面に出す
 		if (shotFlag == false)
 		{
-			// 弾iは現時点を持って存在するので、存在状態を保持する変数にtrueを代入する
 			shotFlag = true;
 			moveFlag = false;
 		}
@@ -133,12 +139,15 @@ void player::update(enemy &Enemy)
 
 		DrawCircle(m_sPosX, m_sPosY, m_sPosR, GetColor(255, 255, 255),true);
 
-		//当たり判定
-		float dx = m_sPosX - Enemy.ePosX[Enemy.eDirection];
-		float dy = m_sPosY - Enemy.ePosY[Enemy.eDirection];
+		
+
+
+		//弾とエネミーの当たり判定
+		float dx = m_sPosX - Enemy.m_ePosX[Enemy.eDirection];
+		float dy = m_sPosY - Enemy.m_ePosY[Enemy.eDirection];
 		float dr = dx * dx + dy * dy;
 
-		float ar = m_sPosR + m_sPosR;
+		float ar = m_sPosR + Enemy.m_ePosR;
 		float dl = ar * ar;
 		if (dr < dl)
 		{
@@ -151,7 +160,8 @@ void player::update(enemy &Enemy)
 		}
 
 		// 画面外に出てしまった場合
-		if (m_sPosY < 0 || m_sPosY > Game::kScreenHeight || m_sPosX < 0 || m_sPosX > Game::kScreenWidth)
+		if (m_sPosY < 0 || m_sPosY > Game::kScreenHeight ||
+			m_sPosX < 0 || m_sPosX > Game::kScreenWidth)
 		{
 			shotFlag = false;
 			moveFlag = true;
@@ -165,37 +175,38 @@ void player::update(enemy &Enemy)
 void player::draw()
 {
 #if true
+
 	if (prev == 0)
 	{
-		DrawBox(m_posX, m_posY, m_posX + 20, m_posY + 20, GetColor(255, 0, 0), true);
+		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(255, 0, 0), true);
 	}
 	else if (prev == 1)
 	{
-		DrawBox(m_posX, m_posY, m_posX + 20, m_posY + 20, GetColor(0, 0, 255), true);
+		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(0, 0, 255), true);
 	}
 	else if (prev == 2)
 	{
-		DrawBox(m_posX, m_posY, m_posX + 20, m_posY + 20, GetColor(0, 255, 0), true);
+		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(0, 255, 0), true);
 	}
 	else if (prev == 3)
 	{
-		DrawBox(m_posX, m_posY, m_posX + 20, m_posY + 20, GetColor(255, 255, 255), true);
+		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(255, 255, 255), true);
 	}
 	else if (prev == 4)
 	{
-		DrawBox(m_posX, m_posY, m_posX + 20, m_posY + 20, GetColor(255, 0, 255), true);
+		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(255, 0, 255), true);
 	}
 	else if (prev == 5)
 	{
-		DrawBox(m_posX, m_posY, m_posX + 20, m_posY + 20, GetColor(0, 156, 209), true);
+		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(0, 156, 209), true);
 	}
 	else if (prev == 6)
 	{
-		DrawBox(m_posX, m_posY, m_posX + 20, m_posY + 20, GetColor(255, 255, 0), true);
+		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(255, 255, 0), true);
 	}
 	else if (prev == 7)
 	{
-		DrawBox(m_posX, m_posY, m_posX + 20, m_posY + 20, GetColor(125, 125, 125), true);
+		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(125, 125, 125), true);
 	}
 
 #endif
@@ -204,10 +215,7 @@ void player::draw()
 
 #if true
 
-	DrawFormatString(0, 0, GetColor(255, 255, 255), "direction = %d", prev);
-
-	DrawFormatString(20, 20, GetColor(255, 255, 255), "X入力値(正:右、負:左) : %d", m_inputX);
-	DrawFormatString(20, 40, GetColor(255, 255, 255), "Y入力値(正:下、負:上) : %d", m_inputY);
+	DrawFormatString(20, 40, GetColor(255, 255, 255), "direction = %d", prev);
 
 	if (prev == 0)
 	{
