@@ -1,11 +1,11 @@
 #include "enemy.h"
+#include "player.h"
 #include "game.h"
-#define ENEMY 8
 
 enemy::enemy() :
-	ePosX(),
-	ePosY(),
-	ePosR(0),
+	m_ePosX(),
+	m_ePosY(),
+	m_ePosR(0),
 	eDirection(0),
 	existFlag(false),
 	moveFlag(false),
@@ -17,36 +17,36 @@ enemy::~enemy()
 {
 }
 
-void enemy::init()
+void enemy::init(player &Player)
 {
-	ePosR = 10;
+	m_ePosR = 10;
 	moveFlag = true;
 
 #if true
 	
-	ePosX[0] = Game::kScreenWidth / 2;
-	ePosY[0] = 20;
+	m_ePosX[0] = Game::kScreenWidth / 2;
+	m_ePosY[0] = 20;
 
-	ePosX[1] = Game::kScreenWidth / 2;
-	ePosY[1] = Game::kScreenHeight - 20;
+	m_ePosX[1] = Game::kScreenWidth / 2;
+	m_ePosY[1] = Game::kScreenHeight - 20;
 
-	ePosX[2] = 20;
-	ePosY[2] = Game::kScreenHeight / 2;
+	m_ePosX[2] = 20;
+	m_ePosY[2] = Game::kScreenHeight / 2;
 
-	ePosX[3] = Game::kScreenWidth - 20;
-	ePosY[3] = Game::kScreenHeight / 2;
+	m_ePosX[3] = Game::kScreenWidth - 20;
+	m_ePosY[3] = Game::kScreenHeight / 2;
 
-	ePosX[4] = Game::kScreenWidth - 20;
-	ePosY[4] = 20;
+	m_ePosX[4] = Game::kScreenWidth - 20;
+	m_ePosY[4] = 20;
 
-	ePosX[5] = Game::kScreenWidth - 20;
-	ePosY[5] = Game::kScreenHeight - 20;
+	m_ePosX[5] = Game::kScreenWidth - 20;
+	m_ePosY[5] = Game::kScreenHeight - 20;
 
-	ePosX[6] = 20;
-	ePosY[6] = Game::kScreenHeight - 20;
+	m_ePosX[6] = 20;
+	m_ePosY[6] = Game::kScreenHeight - 20;
 
-	ePosX[7] = 20;
-	ePosY[7] = 20;
+	m_ePosX[7] = 20;
+	m_ePosY[7] = 20;
 
 #endif
 
@@ -79,24 +79,28 @@ void enemy::init()
 #endif
 }
 
-void enemy::update()
+void enemy::update(player &Player)
 {
 	if (moveFlag == true)
 	{
 		eDirection = GetRand(8 - 1);
 	}
 
-	ePosX[eDirection];
-	ePosY[eDirection];
+	m_ePosX[eDirection];
+	m_ePosY[eDirection];
 
 	if (eDirection == 0)
 	{
 		moveFlag = false;
 		existFlag = true;
-		ePosY[0] += 3;	
-		if (ePosY[0] > Game::kScreenHeight / 2 || deadFlag[0] == true)
+		
+		m_ePosY[0] += 2;	
+		
+		if (deadFlag[0] == true)
 		{
-			ePosY[0] = 20;
+			//位置をリセット
+			m_ePosY[0] = 20;
+
 			existFlag = false;
 			moveFlag = true;
 			deadFlag[0] = false;
@@ -106,10 +110,14 @@ void enemy::update()
 	{
 		moveFlag = false;
 		existFlag = true;
-		ePosY[1] -= 3;
-		if (ePosY[1] < Game::kScreenHeight / 2 || deadFlag[1] == true)
+		
+		m_ePosY[1] -= 2;
+		
+		if (deadFlag[1] == true)
 		{
-			ePosY[1] = Game::kScreenHeight - 20;
+			//位置をリセット
+			m_ePosY[1] = Game::kScreenHeight - 20;
+
 			existFlag = false;
 			moveFlag = true;
 			deadFlag[1] = false;
@@ -119,10 +127,14 @@ void enemy::update()
 	{
 		moveFlag = false;
 		existFlag = true;
-		ePosX[2] += 3;
-		if (ePosX[2] > Game::kScreenWidth / 2 || deadFlag[2] == true)
+		
+		m_ePosX[2] += 2;
+		
+		if (deadFlag[2] == true)
 		{
-			ePosX[2] = 20;
+			//位置をリセット
+			m_ePosX[2] = 20;
+
 			existFlag = false;
 			moveFlag = true;
 			deadFlag[2] = false;
@@ -132,10 +144,14 @@ void enemy::update()
 	{
 		moveFlag = false;
 		existFlag = true;
-		ePosX[3] -= 3;
-		if (ePosX[3] < Game::kScreenWidth / 2 || deadFlag[3] == true)
+		
+		m_ePosX[3] -= 2;
+		
+		if (deadFlag[3] == true)
 		{
-			ePosX[3] = Game::kScreenWidth - 20;
+			//位置をリセット
+			m_ePosX[3] = Game::kScreenWidth - 20;
+
 			existFlag = false;
 			moveFlag = true;
 			deadFlag[3] = false;
@@ -145,13 +161,16 @@ void enemy::update()
 	{
 		moveFlag = false;
 		existFlag = true;
-		ePosX[4] -= 3;
-		ePosY[4] += 3;
-		if (ePosX[4] < Game::kScreenWidth / 2 && ePosY[4] > Game::kScreenHeight / 2
-			|| deadFlag[4] == true)
+		
+		m_ePosX[4] -= 2;
+		m_ePosY[4] += 2;
+		
+		if (deadFlag[4] == true)
 		{
-			ePosX[4] = Game::kScreenWidth - 20;
-			ePosY[4] = 20;
+			//位置をリセット
+			m_ePosX[4] = Game::kScreenWidth - 20;
+			m_ePosY[4] = 20;
+
 			existFlag = false;
 			moveFlag = true;
 			deadFlag[4] = false;
@@ -161,13 +180,16 @@ void enemy::update()
 	{
 		moveFlag = false;
 		existFlag = true;
-		ePosX[5] -= 3;
-		ePosY[5] -= 3;
-		if (ePosX[5] < Game::kScreenWidth / 2 && ePosY[5] < Game::kScreenHeight / 2
-			|| deadFlag[5] == true)
+		
+		m_ePosX[5] -= 2;
+		m_ePosY[5] -= 2;
+		
+		if (deadFlag[5] == true)
 		{
-			ePosX[5] = Game::kScreenWidth - 20;
-			ePosY[5] = Game::kScreenHeight - 20;
+			//位置をリセット
+			m_ePosX[5] = Game::kScreenWidth - 20;
+			m_ePosY[5] = Game::kScreenHeight - 20;
+
 			existFlag = false;
 			moveFlag = true;
 			deadFlag[5] = false;
@@ -177,13 +199,16 @@ void enemy::update()
 	{
 		moveFlag = false;
 		existFlag = true;
-		ePosX[6] += 3;
-		ePosY[6] -= 3;
-		if (ePosX[6] > Game::kScreenWidth / 2 && ePosY[6] < Game::kScreenHeight / 2
-			|| deadFlag[6] == true)
+		
+		m_ePosX[6] += 2;
+		m_ePosY[6] -= 2;
+		
+		if (deadFlag[6] == true)
 		{
-			ePosX[6] = 20;
-			ePosY[6] = Game::kScreenHeight - 20;
+			//位置をリセット
+			m_ePosX[6] = 20;
+			m_ePosY[6] = Game::kScreenHeight - 20;
+
 			existFlag = false;
 			moveFlag = true;
 			deadFlag[6] = false;
@@ -193,18 +218,35 @@ void enemy::update()
 	{
 		moveFlag = false;
 		existFlag = true;
-		ePosX[7] += 3;
-		ePosY[7] += 3;
-		if (ePosX[7] > Game::kScreenWidth / 2 && ePosY[7] > Game::kScreenHeight / 2
-			|| deadFlag[7] == true)
+		
+		m_ePosX[7] += 2;
+		m_ePosY[7] += 2;
+		
+		if (deadFlag[7] == true)
 		{
-			ePosX[7] = 20;
-			ePosY[7] = 20; 
+			//位置をリセット
+			m_ePosX[7] = 20;
+			m_ePosY[7] = 20; 
+
 			existFlag = false;
 			moveFlag = true;
 			deadFlag[7] = false;
 		}
 	}
+
+	//プレイヤーとエネミーの当たり判定
+	float pdx = Player.m_posX - m_ePosX[eDirection];
+	float pdy = Player.m_posY - m_ePosY[eDirection];
+	float pdr = pdx * pdx + pdy * pdy;
+
+	float par = Player.m_posR + m_ePosR;
+	float pdl = par * par;
+	if (pdr < pdl)
+	{
+		deadFlag[eDirection] = true;
+
+	}
+
 }
 
 void enemy::draw()
@@ -213,7 +255,7 @@ void enemy::draw()
 	{
 		for (int i = 0; i < ENEMY; i++)
 		{
-			DrawCircle(ePosX[i], ePosY[i], ePosR, GetColor(255, 255, 255), true);
+			DrawCircle(m_ePosX[i], m_ePosY[i], m_ePosR, GetColor(255, 255, 255), true);
 		}
 	}
 #if true

@@ -1,6 +1,7 @@
 #pragma once
 #include "game.h"
-#define ENEMY 8
+
+class player;
 
 class enemy
 {
@@ -8,21 +9,20 @@ public:
 	enemy();
 	~enemy();
 
-	void init();
-	void update();
+	void init(player &Player);
+	void update(player &Player);
 	void draw();
 
-	int ePosX[ENEMY];
-	int ePosY[ENEMY];
-	int ePosR;
-	bool existFlag;
+	int m_ePosX[ENEMY];
+	int m_ePosY[ENEMY];
+	int m_ePosR;
 	int eDirection;
-	bool moveFlag;
 	
 	bool deadFlag[ENEMY];
 
 private:
 
+	bool existFlag;
+	bool moveFlag;
 
 };
-
