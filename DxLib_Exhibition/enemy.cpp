@@ -246,7 +246,6 @@ void enemy::update(player &Player)
 		deadFlag[eDirection] = true;
 
 	}
-
 }
 
 void enemy::draw()

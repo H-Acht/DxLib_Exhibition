@@ -24,5 +24,4 @@ private:
 
 	bool existFlag;
 	bool moveFlag;
-
 };
