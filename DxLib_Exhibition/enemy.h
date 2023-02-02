@@ -12,15 +12,17 @@ public:
 	void update();
 	void draw();
 
-private:
-
 	int ePosX[ENEMY];
 	int ePosY[ENEMY];
-
-	int eDirection;
-
+	int ePosR;
 	bool existFlag;
-
+	int eDirection;
 	bool moveFlag;
+	
+	bool deadFlag[ENEMY];
+
+private:
+
+
 };
 
