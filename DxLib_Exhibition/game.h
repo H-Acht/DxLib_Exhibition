@@ -1,5 +1,7 @@
 #pragma once
 #include "DxLib.h"
+#define ENEMY 8
+#define TORCH 4
 
 namespace Game
 {
