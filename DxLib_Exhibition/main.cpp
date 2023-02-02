@@ -1,6 +1,7 @@
 #include "game.h"
 #include "player.h"
 #include "enemy.h"
+#include "torch.h"
 
 //プログラムはWin Mainから始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -22,10 +23,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	player Player;
 	enemy Enemy;
+	torch Torch;
 
 	Player.init();
 	Enemy.init();
-
+	Torch.init();
 
 	while (ProcessMessage() == 0)
 	{
@@ -34,11 +36,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//画面のクリア
 		ClearDrawScreen();
 
-		Player.update();
+		Player.update(Enemy);
 		Enemy.update();
+		Torch.update();
 
 		Player.draw();
 		Enemy.draw();
+		Torch.draw();
 
 		//裏画面と表画面を切り替える
 		ScreenFlip();
