@@ -1,7 +1,5 @@
 #include "game.h"
-#include "player.h"
-#include "enemy.h"
-#include "torch.h"
+#include "SceneManager.h"
 
 //プログラムはWin Mainから始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -21,13 +19,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//ダブルバッファモード
 	SetDrawScreen(DX_SCREEN_BACK);
 
-	player Player;
-	enemy Enemy;
-	torch Torch;
-
-	Player.init();
-	Enemy.init();
-	Torch.init();
+	SceneManager scene;
+	scene.init();
 
 	while (ProcessMessage() == 0)
 	{
@@ -36,13 +29,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//画面のクリア
 		ClearDrawScreen();
 
-		Player.update(Enemy);
-		Enemy.update();
-		Torch.update();
-
-		Player.draw();
-		Enemy.draw();
-		Torch.draw();
+		scene.update();
+		scene.draw();
 
 		//裏画面と表画面を切り替える
 		ScreenFlip();
@@ -56,7 +44,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 
-	DxLib_End();            // ＤＸライブラリ使用の終了処理
+	scene.end();
 
+	DxLib_End();  // ＤＸライブラリ使用の終了処理
+	
 	return 0;            // ソフトの終了
 }
