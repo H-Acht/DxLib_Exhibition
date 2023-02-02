@@ -1,6 +1,8 @@
 #pragma once
 #include "Game.h"
 
+class enemy;
+
 class player
 {
 public:
@@ -8,9 +10,10 @@ public:
 	~player();
 
 	void init();
-	void update();
+	void update(enemy &Enemy);
 	void draw();
 
+	
 private:
 	//プレイヤー位置
 	int m_posX;
@@ -26,8 +29,10 @@ private:
 	int m_inputY;
 
 	//shot
-	int m_shotX;
-	int m_shotY;
+	int m_sPosX;
+	int m_sPosY;
+	int m_sPosR;
+
 	bool shotFlag;
 
 	bool moveFlag;

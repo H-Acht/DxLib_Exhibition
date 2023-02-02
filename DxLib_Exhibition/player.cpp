@@ -1,5 +1,6 @@
 #include "player.h"
 #include "game.h"
+#include "enemy.h"
 
 player::player() :
 	m_posX(0),
@@ -8,9 +9,11 @@ player::player() :
 	prev(0),
 	m_inputX(0),
 	m_inputY(0),
-	m_shotX(0),
-	m_shotY(0),
-	shotFlag(false)
+	m_sPosX(0),
+	m_sPosY(0),
+	m_sPosR(0),
+	shotFlag(false),
+	moveFlag(false)
 {
 }
 
@@ -24,14 +27,15 @@ void player::init()
 	m_posY = Game::kScreenHeight / 2;
 
 	shotFlag = false;
-	m_shotX = m_posX;
-	m_shotY = m_posY;
-	
+	m_sPosX = m_posX;
+	m_sPosY = m_posY;
+	m_sPosR = 10;
+
 	bool prevShotFlag = false;
 	moveFlag = true;
 }
 
-void player::update()
+void player::update(enemy &Enemy)
 {
 	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
@@ -92,53 +96,71 @@ void player::update()
 	{
 		if (prev == 0)
 		{
-			m_shotY -= 16;
+			m_sPosY -= 16;
 		}
 		else if (prev == 1)
 		{
-			m_shotY += 16;
+			m_sPosY += 16;
 		}
 		else if (prev == 2)
 		{
-			m_shotX -= 16;
+			m_sPosX -= 16;
 		}
 		else if (prev == 3)
 		{
-			m_shotX += 16;
+			m_sPosX += 16;
 		}
 		else if (prev == 4)
 		{
-			m_shotX += 10;
-			m_shotY -= 10;
+			m_sPosX += 10;
+			m_sPosY -= 10;
 		}
 		else if (prev == 5)
 		{
-			m_shotX += 10;
-			m_shotY += 10;
+			m_sPosX += 10;
+			m_sPosY += 10;
 		}
 		else if (prev == 6)
 		{
-			m_shotX -= 10;
-			m_shotY += 10;
+			m_sPosX -= 10;
+			m_sPosY += 10;
 		}
 		else if (prev == 7)
 		{
-			m_shotX -= 10;
-			m_shotY -= 10;
+			m_sPosX -= 10;
+			m_sPosY -= 10;
 		}
 
-		DrawCircle(m_shotX, m_shotY, 10, GetColor(255, 255, 255),true);
+		DrawCircle(m_sPosX, m_sPosY, m_sPosR, GetColor(255, 255, 255),true);
 
-		// 画面外に出てしまった場合は存在状態を保持している変数にfalse(存在しない)を代入する
-		if (m_shotY < 0 || m_shotY > Game::kScreenHeight || m_shotX < 0 || m_shotX > Game::kScreenWidth)
+		//当たり判定
+		float dx = m_sPosX - Enemy.ePosX[Enemy.eDirection];
+		float dy = m_sPosY - Enemy.ePosY[Enemy.eDirection];
+		float dr = dx * dx + dy * dy;
+
+		float ar = m_sPosR + m_sPosR;
+		float dl = ar * ar;
+		if (dr < dl)
+		{
+			Enemy.deadFlag[Enemy.eDirection] = true;
+
+			shotFlag = false;
+			moveFlag = true;
+			m_sPosX = m_posX;
+			m_sPosY = m_posY;
+		}
+
+		// 画面外に出てしまった場合
+		if (m_sPosY < 0 || m_sPosY > Game::kScreenHeight || m_sPosX < 0 || m_sPosX > Game::kScreenWidth)
 		{
 			shotFlag = false;
 			moveFlag = true;
-			m_shotX = m_posX;
-			m_shotY = m_posY;
+			m_sPosX = m_posX;
+			m_sPosY = m_posY;
 		}
 	}
 }
+
 
 void player::draw()
 {
@@ -221,3 +243,5 @@ void player::draw()
 	}
 #endif
 }
+
+
