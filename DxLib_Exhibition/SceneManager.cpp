@@ -1,9 +1,10 @@
 #include "SceneManager.h"
 #include <cassert>
 #include "SceneMain.h"
-
 #include "SceneTitle.h"
-
+#include "SceneGameOver.h"
+#include "SceneClear.h"
+#include "SceneMain2.h"
 
 SceneManager::SceneManager()
 {
