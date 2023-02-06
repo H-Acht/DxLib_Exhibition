@@ -20,6 +20,7 @@ public:
 	virtual void draw() override;
 
 	virtual bool isEnd() { return m_isEnd; }
+
 private:
 	
 	player m_player;
@@ -27,4 +28,6 @@ private:
 	torch m_torch;
 	
 	bool m_isEnd;
+
+
 };
