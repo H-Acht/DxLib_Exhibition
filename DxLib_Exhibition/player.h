@@ -10,7 +10,8 @@ public:
 	~player();
 
 	void init();
-	void update(enemy &Enemy);
+	void update();
+	void shot(enemy& Enemy);
 	void draw();
 
 	//プレイヤー位置
@@ -22,7 +23,9 @@ public:
 	int m_drawPosX;
 	int m_drawPosY;
 
+	bool damageFlag;
 	
+	int pHP;
 private:
 	//プレイヤーの向いている方向
 	int m_dir;
