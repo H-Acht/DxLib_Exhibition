@@ -12,7 +12,8 @@ void SceneMain::init()
 
 SceneBase* SceneMain::update()
 {
-	m_player.update(m_enemy);
+	m_player.update();
+	m_player.shot(m_enemy);
 	m_enemy.update(m_player);
 	m_torch.update(m_enemy);
 

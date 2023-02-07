@@ -15,8 +15,10 @@ public:
 	void draw();
 
 private:
-	int m_tPosX[4];
-	int m_tPosY[4];
-	int m_tPosR;
-};
+	int m_tPosX[TORCH];
+	int m_tPosY[TORCH];
+	int m_tPosR[TORCH];
 
+	bool burnFlag[TORCH];
+	
+};

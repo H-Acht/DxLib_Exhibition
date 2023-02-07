@@ -11,6 +11,8 @@ public:
 
 	void init(player &Player);
 	void update(player &Player);
+	void update2(player& Player);
+
 	void draw();
 
 	int m_ePosX[ENEMY];
@@ -20,8 +22,9 @@ public:
 	
 	bool deadFlag[ENEMY];
 
-private:
+	int deadCount;
 
+private:
 	bool existFlag;
 	bool moveFlag;
 };
