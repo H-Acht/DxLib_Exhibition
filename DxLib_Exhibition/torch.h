@@ -14,11 +14,14 @@ public:
 	void update(enemy &Enemy);
 	void draw();
 
+	bool burnFlag[TORCH];
+	int R, G, B;
+
+	int torchCount;
+
 private:
 	int m_tPosX[TORCH];
 	int m_tPosY[TORCH];
 	int m_tPosR[TORCH];
 
-	bool burnFlag[TORCH];
-	
 };
