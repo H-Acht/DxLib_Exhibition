@@ -20,4 +20,6 @@ SceneBase* SceneTitle::update()
 void SceneTitle::draw()
 {
 	DrawString(100, 100, "ñ¢íË", GetColor(100, 100, 100));
+	DrawString(100, 150, "START Å® 2É{É^Éì", GetColor(255, 255, 255));
+
 }

@@ -2,9 +2,6 @@
 #include <cassert>
 #include "SceneMain.h"
 #include "SceneTitle.h"
-#include "SceneGameOver.h"
-#include "SceneClear.h"
-#include "SceneMain2.h"
 
 SceneManager::SceneManager()
 {
@@ -18,8 +15,16 @@ SceneManager::~SceneManager()
 
 void SceneManager::init()
 {
+
+#ifdef _DEBUG
 	m_pScene = new SceneMain;
+#else
+	m_pScene = new SceneTitle;
+#endif	
+
 	m_pScene->init();
+
+
 }
 
 void SceneManager::end()
