@@ -11,20 +11,21 @@ public:
 
 	void init(player &Player);
 	void update(player &Player);
-	void update2(player& Player);
+	void update2(player &Player);
 
 	void draw();
 
-	int m_ePosX[ENEMY];
-	int m_ePosY[ENEMY];
+	float m_ePosX[DIR][ENEMY]; //[ï˚å¸][î‘çÜ]
+	float m_ePosY[DIR][ENEMY];
 	int m_ePosR;
-	int eDirection;
 	
-	bool deadFlag[ENEMY];
+	bool deadFlag[DIR][ENEMY];//
 
 	int deadCount;
 
+	int eDirection[ENEMY];
+	int enemyKinds[ENEMY];
 private:
-	bool existFlag;
-	bool moveFlag;
+	bool moveFlag[ENEMY];
 };
+ 
