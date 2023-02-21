@@ -1,17 +1,16 @@
 #pragma once
 #include "SceneBase.h"
-#include "player.h"
-#include "enemy.h"
-#include "torch.h"
+
+class player;
+class enemy;
+class torch;
+class ScoreBoard;
 
 class SceneMain : public SceneBase
 {
 public:
-	SceneMain()
-	{
-		m_isEnd = false;
-	}
-	virtual ~SceneMain() {}
+	SceneMain();
+	virtual ~SceneMain();
 
 	virtual void init() override;
 	virtual void end() override {}
@@ -19,15 +18,42 @@ public:
 	virtual SceneBase* update() override;
 	virtual void draw() override;
 
+	virtual void gameoverUpdate();
+	virtual void gameoverDraw();
+
+	virtual void mainUpdate1();
+	virtual void mainDraw1();
+
+	virtual void clearUpdate1();
+	virtual void clearDraw1();
+
+	virtual void mainUpdate2();
+	virtual void mainDraw2();
+
+	virtual void clearUpdate2();
+	virtual void clearDraw2();
+
+
 	virtual bool isEnd() { return m_isEnd; }
 
 private:
 	
-	player m_player;
-	enemy m_enemy;
-	torch m_torch;
+	player* m_pPlayer;
+	enemy* m_pEnemy;
+	torch* m_pTorch;
+	ScoreBoard* m_pScore;
 	
+	int num;
+
 	bool m_isEnd;
 
+	int select;
 
+	int textPosX;
+	int textPosX2;
+
+	int circlePosY;
+
+	int prev;
+	
 };
