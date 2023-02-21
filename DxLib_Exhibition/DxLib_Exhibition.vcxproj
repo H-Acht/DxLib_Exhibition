@@ -149,12 +149,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="SceneBase.cpp" />
-    <ClCompile Include="SceneClear.cpp" />
-    <ClCompile Include="SceneGameOver.cpp" />
     <ClCompile Include="SceneMain.cpp" />
-    <ClCompile Include="SceneMain2.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
+    <ClCompile Include="ScoreBoard.cpp" />
     <ClCompile Include="torch.cpp" />
     <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
@@ -163,12 +161,10 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="SceneBase.h" />
-    <ClInclude Include="SceneClear.h" />
-    <ClInclude Include="SceneGameOver.h" />
     <ClInclude Include="SceneMain.h" />
-    <ClInclude Include="SceneMain2.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SceneTitle.h" />
+    <ClInclude Include="ScoreBoard.h" />
     <ClInclude Include="torch.h" />
     <ClInclude Include="Vec2.h" />
   </ItemGroup>
