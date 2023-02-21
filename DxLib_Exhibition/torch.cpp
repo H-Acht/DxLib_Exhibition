@@ -74,7 +74,6 @@ void torch::update(enemy &Enemy)
 
 void torch::draw()
 {
-	
 	for (int i = 0; i < TORCH; i++)
 	{
 		if (burnFlag[i] == true)

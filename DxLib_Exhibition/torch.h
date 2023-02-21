@@ -8,7 +8,7 @@ class torch
 {
 public:
 	torch();
-	~torch();
+	virtual ~torch();
 
 	void init(player &Player);
 	void update(enemy &Enemy);
