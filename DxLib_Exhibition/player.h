@@ -9,7 +9,7 @@ class player
 {
 public:
 	player();
-	~player();
+	virtual ~player();
 
 	void init();
 	void update();
