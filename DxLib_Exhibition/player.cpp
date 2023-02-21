@@ -1,7 +1,10 @@
 #include "player.h"
-#include "game.h"
 #include "enemy.h"
-#include "SceneGameOver.h"
+#include "torch.h"
+
+#include "game.h"
+#include "SceneMain.h"
+
 
 player::player() :
 	m_posX(0),
@@ -19,17 +22,23 @@ player::player() :
 	shotFlag(false),
 	moveFlag(false),
 	pHP(0),
-	damageFlag(false)
+	damageFlag(false),
+	m_pHandle()
 {
 }
 
 player::~player()
 {
+	for (int i = 0; i < 9; i++)
+	{
+		DeleteGraph(m_pHandle[i]);
+		LoadDivGraph("Data/Bow and Arrows.png", 9, 3, 3, 16, 16, m_pHandle);
+	}
 }
 
 void player::init()
 {
-	m_posX = Game::kScreenWidth / 2 ;
+	m_posX = (Game::kScreenWidth + 500) / 2;
 	m_posY = Game::kScreenHeight / 2;
 	m_posR = 10;
 
@@ -39,16 +48,17 @@ void player::init()
 	shotFlag = false;
 	m_sPosX = m_posX;
 	m_sPosY = m_posY;
-	m_sPosR = 10;
+	m_sPosR = 8;
 
 	moveFlag = true;
 
 	pHP = 3;
-
+	LoadDivGraph("Data/Bow and Arrows.png", 9,3,3,16,16,m_pHandle);
 }
 
 void player::update()
 {
+	 
 	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
 	if (moveFlag == true)
@@ -94,6 +104,7 @@ void player::update()
 			prev = m_dir;
 		}
 	}
+
 }
 
 void player::shot(enemy &Enemy)
@@ -130,49 +141,51 @@ void player::shot(enemy &Enemy)
 		else if (prev == 4)
 		{
 			m_sPosX += 10;
-			m_sPosY -= 10;
+			m_sPosY -= 8.182;	//(16 : 9) = (10 : 5.6)
 		}
 		else if (prev == 5)
 		{
 			m_sPosX += 10;
-			m_sPosY += 10;
+			m_sPosY += 8.182;
 		}
 		else if (prev == 6)
 		{
 			m_sPosX -= 10;
-			m_sPosY += 10;
+			m_sPosY += 8.182;
 		}
 		else if (prev == 7)
 		{
 			m_sPosX -= 10;
-			m_sPosY -= 10;
+			m_sPosY -= 8.182;
 		}
 
 		DrawCircle(m_sPosX, m_sPosY, m_sPosR, GetColor(255, 255, 255), true);
-
 	}
 
 	//弾とエネミーの当たり判定
-	float dx = m_sPosX - Enemy.m_ePosX[Enemy.eDirection];
-	float dy = m_sPosY - Enemy.m_ePosY[Enemy.eDirection];
-	float dr = dx * dx + dy * dy;
-
-	float ar = m_sPosR + Enemy.m_ePosR;
-	float dl = ar * ar;
-	if (dr < dl)
+	for (int i = 0; i < ENEMY; i++)
 	{
-		Enemy.deadFlag[Enemy.eDirection] = true;
+		float dx = m_sPosX - Enemy.m_ePosX[Enemy.eDirection[i]][i];
+		float dy = m_sPosY - Enemy.m_ePosY[Enemy.eDirection[i]][i];
+		float dr = dx * dx + dy * dy;
 
-		shotFlag = false;
-		moveFlag = true;
-		m_sPosX = m_posX;
-		m_sPosY = m_posY;
-		Enemy.deadCount++;
+		float ar = m_sPosR + Enemy.m_ePosR;
+		float dl = ar * ar;
+		
+		if (dr < dl)
+		{
+			Enemy.deadFlag[Enemy.eDirection[i]][i] = true;
+
+			shotFlag = false;
+			moveFlag = true;
+			m_sPosX = m_posX;
+			m_sPosY = m_posY;
+		}
 	}
 
 	// 画面外に出てしまった場合
 	if (m_sPosY < 0 || m_sPosY > Game::kScreenHeight ||
-		m_sPosX < 0 || m_sPosX > Game::kScreenWidth)
+		m_sPosX < 500 || m_sPosX > Game::kScreenWidth)
 	{
 		shotFlag = false;
 		moveFlag = true;
@@ -187,9 +200,7 @@ void player::shot(enemy &Enemy)
 	}
 }
 
-
-
-void player::draw()
+void player::draw(torch &Torch)
 {
 #if true
 	if (prev == 0)
@@ -225,51 +236,11 @@ void player::draw()
 		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(125, 125, 125), true);
 	}
 
-	//DrawCircle(m_posX, m_posY, m_posR, GetColor(0, 255, 0), false);
-
 #endif
 
-
-
+	SetDrawBright(Torch.R, Torch.G, Torch.B);
 
 #if true
-
-	DrawFormatString(20, 40, GetColor(255, 255, 255), "direction = %d", prev);
-
-	if (prev == 0)
-	{
-		DrawString(20, 60, "上", GetColor(255, 255, 255), true);
-	}
-	else if (prev == 1)
-	{
-		DrawString(20, 60, "下", GetColor(255, 255, 255), true);
-	}
-	else if (prev == 2)
-	{
-		DrawString(20, 60, "左", GetColor(255, 255, 255), true);
-	}
-	else if (prev == 3)
-	{
-		DrawString(20, 60, "右", GetColor(255, 255, 255), true);
-	}
-	else if (prev == 4)
-	{
-		DrawString(20, 60, "右上", GetColor(255, 255, 255), true);
-	}
-	else if (prev == 5)
-	{
-		DrawString(20, 60, "右下", GetColor(255, 255, 255), true);
-	}
-	else if (prev == 6)
-	{
-		DrawString(20, 60, "左下", GetColor(255, 255, 255), true);
-	}
-	else if (prev == 7)
-	{
-		DrawString(20, 60, "左上", GetColor(255, 255, 255), true);
-	}
-
-	DrawFormatString(20, 100, GetColor(255, 255, 255), "HP = %d", pHP);
 
 #endif
 }
