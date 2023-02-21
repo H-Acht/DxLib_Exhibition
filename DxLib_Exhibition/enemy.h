@@ -7,7 +7,7 @@ class enemy
 {
 public:
 	enemy();
-	~enemy();
+	virtual ~enemy();
 
 	void init(player &Player);
 	void update(player &Player);
@@ -19,7 +19,7 @@ public:
 	float m_ePosY[DIR][ENEMY];
 	int m_ePosR;
 	
-	bool deadFlag[DIR][ENEMY];//
+	bool deadFlag[DIR][ENEMY];
 
 	int deadCount;
 
@@ -28,4 +28,3 @@ public:
 private:
 	bool moveFlag[ENEMY];
 };
- 

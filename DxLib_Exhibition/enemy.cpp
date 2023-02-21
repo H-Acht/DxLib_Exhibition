@@ -39,8 +39,7 @@ void enemy::init(player &Player)
 		m_ePosY[1][i] = Game::kScreenHeight - 20;
 
 		m_ePosX[2][i] = 520.0f;
-		m_ePosY[2][i] = Game::kScreenHeight / 2;
-
+		m_ePosY[2][i] = Game::kScreenHeight / 2; 
 		m_ePosX[3][i] = Game::kScreenWidth - 20;
 		m_ePosY[3][i] = Game::kScreenHeight / 2;
 
@@ -60,7 +59,6 @@ void enemy::init(player &Player)
 #endif
 
 #if false
-	eDirection = GetRand(8 - 1);
 
 	ePosX[0] = Game::kScreenWidth / 2;
 	ePosY[0] = -20;
@@ -324,7 +322,7 @@ void enemy::update2(player& Player)
 	{
 		moveFlag[0] = false;
 
-		if (enemyKinds == 0)
+		if (enemyKinds[0] == 0)
 		{
 			m_ePosX[2][0] += 3;
 		}
@@ -518,7 +516,7 @@ void enemy::update2(player& Player)
 
 	else if (eDirection[1] == 1) //‰º
 	{
-		moveFlag[0] = false;
+		moveFlag[1] = false;
 
 		if (enemyKinds[1] == 0)
 		{
