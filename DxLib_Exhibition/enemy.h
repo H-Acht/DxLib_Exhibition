@@ -12,6 +12,10 @@ public:
 	void init(player &Player);
 	void update(player &Player);
 	void update2(player &Player);
+	void update3(player& Player);
+	void update4(player& Player);
+	void update5(player& Player);
+
 
 	void draw();
 

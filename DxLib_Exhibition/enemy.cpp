@@ -258,10 +258,187 @@ void enemy::update(player &Player)
 	}
 }
 
-
 ////////////////////main2////////////////////
 
 void enemy::update2(player& Player)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		if (moveFlag[i] == true)
+		{
+			eDirection[i] = GetRand(8 - 1);
+		}
+
+		m_ePosX[eDirection[i]];
+		m_ePosY[eDirection[i]];
+
+		if (eDirection[i] == 0)//上
+		{
+			moveFlag[i] = false;
+
+			m_ePosY[0][i] += 3;
+
+			if (deadFlag[0][i] == true)
+			{
+				//位置をリセット
+				m_ePosX[0][i] = static_cast<float>((Game::kScreenWidth + 500)) / 2;
+				m_ePosY[0][i] = 20.0f;
+
+				moveFlag[i] = true;
+				deadFlag[0][i] = false;
+				deadCount++;
+			}
+		}
+		else if (eDirection[i] == 1)//下
+		{
+			moveFlag[i] = false;
+
+			m_ePosY[1][i] -= 3;
+
+			if (deadFlag[1][i] == true)
+			{
+				//位置をリセット
+				m_ePosX[1][i] = static_cast<float>((Game::kScreenWidth + 500)) / 2;
+				m_ePosY[1][i] = Game::kScreenHeight - 20;
+
+				moveFlag[i] = true;
+				deadFlag[1][i] = false;
+				deadCount++;
+			}
+		}
+		else if (eDirection[i] == 2)//左
+		{
+			moveFlag[i] = false;
+
+			m_ePosX[2][i] += 3;
+
+			if (deadFlag[2][i] == true)
+			{
+				//位置をリセット
+				m_ePosX[2][i] = 520.0f;
+				m_ePosY[2][i] = static_cast<float>(Game::kScreenHeight) / 2;
+
+				moveFlag[i] = true;
+				deadFlag[2][i] = false;
+				deadCount++;
+			}
+		}
+		else if (eDirection[i] == 3)//右
+		{
+			moveFlag[i] = false;
+
+			m_ePosX[3][i] -= 3;
+
+			if (deadFlag[3][i] == true)
+			{
+				//位置をリセット
+				m_ePosX[3][i] = Game::kScreenWidth - 20;
+				m_ePosY[3][i] = static_cast<float>(Game::kScreenHeight) / 2;
+
+				moveFlag[i] = true;
+				deadFlag[3][i] = false;
+				deadCount++;
+			}
+		}
+		else if (eDirection[i] == 4)//右上
+		{
+			moveFlag[i] = false;
+
+			m_ePosX[4][i] -= 3;
+			m_ePosY[4][i] += 2.455;
+
+			if (deadFlag[4][i] == true)
+			{
+				//位置をリセット
+				m_ePosX[4][i] = Game::kScreenWidth - 20;
+				m_ePosY[4][i] = 20;
+
+				moveFlag[i] = true;
+				deadFlag[4][i] = false;
+				deadCount++;
+			}
+		}
+		else if (eDirection[i] == 5)//右下
+		{
+			moveFlag[i] = false;
+
+			m_ePosX[5][i] -= 3;
+			m_ePosY[5][i] -= 2.455;
+
+			if (deadFlag[5][i] == true)
+			{
+				//位置をリセット
+				m_ePosX[5][i] = Game::kScreenWidth - 20;
+				m_ePosY[5][i] = Game::kScreenHeight - 20;
+
+				moveFlag[i] = true;
+				deadFlag[5][i] = false;
+				deadCount++;
+			}
+		}
+		else if (eDirection[i] == 6)//左下
+		{
+			moveFlag[i] = false;
+
+			m_ePosX[6][i] += 3;
+			m_ePosY[6][i] -= 2.455;
+
+			if (deadFlag[6][i] == true)
+			{
+				//位置をリセット
+				m_ePosX[6][i] = 520.0f;
+				m_ePosY[6][i] = Game::kScreenHeight - 20;
+
+				moveFlag[i] = true;
+				deadFlag[6][i] = false;
+				deadCount++;
+			}
+		}
+		else if (eDirection[i] == 7)//左上
+		{
+			moveFlag[i] = false;
+
+			m_ePosX[7][i] += 3;
+			m_ePosY[7][i] += 2.455;
+
+			if (deadFlag[7][i] == true)
+			{
+				//位置をリセット
+				m_ePosX[7][i] = 520.0f;
+				m_ePosY[7][i] = 20.0f;
+
+				moveFlag[i] = true;
+				deadFlag[7][i] = false;
+				deadCount++;
+			}
+		}
+
+		//プレイヤーとエネミーの当たり判定
+		float dx = static_cast<int>(Player.m_posX) - static_cast<int>(m_ePosX[eDirection[i]][i]);
+		float dy = Player.m_posY - m_ePosY[eDirection[i]][i];
+		float dr = dx * dx + dy * dy;
+
+		float ar = Player.m_posR + m_ePosR;
+		float dl = ar * ar;
+		if (dr < dl)
+		{
+			deadFlag[eDirection[i]][i] = true;// ここでプレイヤーにぶつかった際に撃破数が増える、要修正
+			deadCount--;// ↑の仮修正
+			Player.damageFlag = true;
+		}
+
+		int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+		if (padState & PAD_INPUT_4)
+		{
+			deadCount = 25;
+		}
+	}
+}
+
+
+////////////////////main3////////////////////
+
+void enemy::update3(player& Player)
 {
 	if (moveFlag[0] == true)
 	{
@@ -698,6 +875,20 @@ void enemy::update2(player& Player)
 		deadCount--;
 		Player.damageFlag = true;
 	}
+
+	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+	if (padState & PAD_INPUT_4)
+	{
+		deadCount = 30;
+	}
+}
+
+void enemy::update4(player& Player)
+{
+}
+
+void enemy::update5(player& Player)
+{
 }
 
 void enemy::draw()
@@ -709,7 +900,7 @@ void enemy::draw()
 		{
 			DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 255, 255), true);
 		}
-		if (enemyKinds[0] == 1)
+		else if (enemyKinds[0] == 1)
 		{
 			DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 0, 0), true);
 		}
@@ -718,7 +909,7 @@ void enemy::draw()
 		{
 			DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 255, 255), true);
 		}
-		if (enemyKinds[1] == 1)
+		else if (enemyKinds[1] == 1)
 		{
 			DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), true);
 		}
