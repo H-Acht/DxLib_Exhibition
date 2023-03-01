@@ -10,12 +10,12 @@ public:
 	virtual ~enemy();
 
 	void init(player &Player);
-	void update(player &Player);
+	void update1(player &Player);
 	void update2(player &Player);
 	void update3(player& Player);
 	void update4(player& Player);
 	void update5(player& Player);
-
+	void update6(player& Player);
 
 	void draw();
 
@@ -29,6 +29,36 @@ public:
 
 	int eDirection[ENEMY];
 	int enemyKinds[ENEMY];
+	
 private:
 	bool moveFlag[ENEMY];
+	
+	int m_batHandle[8];
+	int m_eyeHandle[8];
+	int m_eyeDeathHandle[4];
+	int m_skeletonHandle[4];
+	int m_skeletonDeathHandle[4];
+	int m_mushHandle[8];
+	int m_mushDeathHandle[4];
+
+
+	int batAnimation;
+	int Bat;
+
+	int eyeAnimation;
+	int Eye;
+
+	int skeletonAnimation;
+	int Skeleton;
+
+	int mushAnimation;
+	int Mush;
+
+	int deathAnimation;
+	int Death;
+	bool dFlag;
+
+	float deathPosX;
+	float deathPosY;
+
 };
