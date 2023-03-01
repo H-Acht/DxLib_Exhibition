@@ -27,12 +27,6 @@ public:
 	virtual void clearUpdate1();
 	virtual void clearDraw1();
 
-	virtual void mainUpdate2();
-	virtual void mainDraw2();
-
-	virtual void clearUpdate2();
-	virtual void clearDraw2();
-
 
 	virtual bool isEnd() { return m_isEnd; }
 
@@ -48,12 +42,12 @@ private:
 	bool m_isEnd;
 
 	int select;
-
+	
 	int textPosX;
 	int textPosX2;
+	int textPosX3;
 
 	int circlePosY;
 
 	int prev;
-	
 };
