@@ -76,7 +76,7 @@ void ScoreBoard::draw(player& Player, enemy& Enemy, torch& Torch)
 
 	DrawFormatString(20, 140, GetColor(255, 255, 255), "èºñæ = %d", Torch.torchCount);
 
-	//DrawFormatString(20, 140, GetColor(255, 255, 255), "ã‡ = %d", Money.haveMoney);
+	DrawFormatString(20, 160, GetColor(255, 255, 255), "ïêäÌ = %d", Player.weapon);
 
 #endif
 }

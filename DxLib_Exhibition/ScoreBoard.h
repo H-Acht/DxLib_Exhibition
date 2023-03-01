@@ -9,7 +9,7 @@ class ScoreBoard
 {
 public:
 	ScoreBoard();
-	~ScoreBoard();
+	virtual ~ScoreBoard();
 	
 	void init();
 	void update();
@@ -19,4 +19,4 @@ private:
 	int boardPosX;
 	int boardPosY;
 };
-
+		
