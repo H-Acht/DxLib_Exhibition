@@ -31,10 +31,11 @@ public:
 	int pHP;
 	int prev;
 
+	int weapon;
+
 private:
 	//ƒvƒŒƒCƒ„[‚ÌŒü‚¢‚Ä‚¢‚é•ûŒü
 	int m_dir;
-	//•ûŒü‚ğ•Û‘¶
 
 	//pad“ü—Í
 	int m_inputX;
@@ -49,6 +50,22 @@ private:
 
 	bool moveFlag;
 
-	int m_pHandle[9];
+	int m_shotHandle[21];
+	
+	int m_hitHandle[8];
 
+	int Shot;
+	int shotAnimation;
+
+	int Hit;
+	int hitAnimation;
+
+	float PI;
+
+	int push;
+
+	bool hitFlag;
+
+	float hitPosX;
+	float hitPosY;
 };
