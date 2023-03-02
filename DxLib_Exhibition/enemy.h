@@ -17,6 +17,8 @@ public:
 	void update5(player& Player);
 	void update6(player& Player);
 
+	void updateBoss(player& Player);
+
 	void draw();
 
 	float m_ePosX[DIR][ENEMY]; //[ï˚å¸][î‘çÜ]
@@ -29,16 +31,22 @@ public:
 
 	int eDirection[ENEMY];
 	int enemyKinds[ENEMY];
+
+	float deathPosX[DIR][ENEMY];
+	float deathPosY[DIR][ENEMY];
+	bool dFlag[DIR][ENEMY];
+
 	
 private:
 	bool moveFlag[ENEMY];
 	
 	int m_batHandle[8];
 	int m_eyeHandle[8];
-	int m_eyeDeathHandle[4];
 	int m_skeletonHandle[4];
-	int m_skeletonDeathHandle[4];
 	int m_mushHandle[8];
+
+	int m_eyeDeathHandle[4];
+	int m_skeletonDeathHandle[4];
 	int m_mushDeathHandle[4];
 
 
@@ -56,9 +64,13 @@ private:
 
 	int deathAnimation;
 	int Death;
-	bool dFlag;
 
-	float deathPosX;
-	float deathPosY;
+	int zakoHP;
+	bool zako;
 
+	int bossHP;
+
+	int count;
+
+	bool flag;
 };

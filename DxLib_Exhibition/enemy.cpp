@@ -29,9 +29,14 @@ enemy::enemy() :
 	m_mushDeathHandle(),
 	m_eyeHandle(),
 	m_eyeDeathHandle(),
-	dFlag(false),
-	deathPosX(0),
-	deathPosY(0)
+	dFlag(),
+	deathPosX(),
+	deathPosY(),
+	bossHP(0),
+	zako(true),
+	count(0),
+	flag(false),
+	zakoHP(0)
 {
 }
 
@@ -60,13 +65,16 @@ void enemy::init(player &Player)
 		moveFlag[i] = true;
 	}
 
+	zakoHP = 3;
+	bossHP = 30;
+
 	LoadDivGraph("Data/Bat_spritesheet.png", 8, 3, 3, 256, 256, m_batHandle);
 	LoadDivGraph("Data/EyeFlight.png", 8, 8, 1, 150, 150, m_eyeHandle);
-	LoadDivGraph("Data/EyeDeath.png", 8, 8, 1, 150, 150, m_eyeDeathHandle);
+	LoadDivGraph("Data/EyeDeath.png", 4, 4, 1, 150, 150, m_eyeDeathHandle);
 	LoadDivGraph("Data/SkeletonWalk.png", 4, 4, 1, 150, 150, m_skeletonHandle);
 	LoadDivGraph("Data/SkeletonDeath.png", 4, 4, 1, 150, 150, m_skeletonDeathHandle);
 	LoadDivGraph("Data/MushRun.png", 8, 8, 1, 150, 150, m_mushHandle);
-	LoadDivGraph("Data/MushDeath.png", 8, 8, 1, 150, 150, m_mushDeathHandle);
+	LoadDivGraph("Data/MushDeath.png", 4, 4, 1, 150, 150, m_mushDeathHandle);
 
 
 #if true
@@ -180,6 +188,7 @@ void enemy::update1(player &Player)
 
 		if (deadFlag[3][0] == true)
 		{
+			
 			//位置をリセット
 			m_ePosX[3][0] = Game::kScreenWidth - 20;
 			m_ePosY[3][0] = static_cast<float>(Game::kScreenHeight) / 2;
@@ -198,6 +207,11 @@ void enemy::update1(player &Player)
 		
 		if (deadFlag[4][0] == true)
 		{
+			/*dFlag[3] = true;
+
+			deathPosX[3][0] = m_ePosX[3][0];
+			deathPosY[3][0] = m_ePosY[3][0];*/
+
 			//位置をリセット
 			m_ePosX[4][0] = Game::kScreenWidth - 20;
 			m_ePosY[4][0] = 20;
@@ -1285,6 +1299,215 @@ void enemy::update6(player& Player)
 
 }
 
+void enemy::updateBoss(player& Player)
+{
+	///////////////BOSS////////////////
+
+	m_ePosX[2][3];
+	m_ePosY[2][3];
+	
+	if (zako == true)
+	{
+		m_ePosX[2][3] += 1;
+
+		if (deadFlag[2][3] == true)
+		{
+			zakoHP -= 1;
+			deadFlag[2][3] = false;
+
+
+			if (zakoHP <= 0)
+			{
+				//死亡演出
+				zako = false;
+			}
+		}
+	}
+	else
+	{
+		if (flag == true)
+		{
+			if (moveFlag[3] == true)
+			{
+				eDirection[3] = GetRand(8 - 1);
+			}
+
+			m_ePosX[eDirection[3]][3];
+			m_ePosY[eDirection[3]][3];
+
+			if (eDirection[3] == 0)//上
+			{
+				moveFlag[3] = false;
+
+				m_ePosY[0][3] += 3;
+
+				if (deadFlag[0][3] == true)
+				{
+					bossHP -= 1;
+
+					moveFlag[3] = true;
+					deadFlag[0][3] = false;
+
+					if (bossHP <= 0)
+					{
+						//死亡演出
+					}
+				}
+			}
+			else if (eDirection[3] == 1)//下
+			{
+				moveFlag[3] = false;
+
+				m_ePosY[1][3] -= 3;
+
+				if (deadFlag[1][3] == true)
+				{
+					bossHP -= 1;
+
+					moveFlag[3] = true;
+					deadFlag[3][3] = false;
+
+					if (bossHP <= 0)
+					{
+						//死亡演出
+					}
+				}
+			}
+			else if (eDirection[3] == 2)//左
+			{
+				moveFlag[3] = false;
+
+				m_ePosX[2][3] += 3;
+
+				if (deadFlag[2][3] == true)
+				{
+					bossHP -= 1;
+
+					moveFlag[3] = true;
+					deadFlag[2][3] = false;
+
+					if (bossHP <= 0)
+					{
+						//死亡演出
+					}
+				}
+			}
+			else if (eDirection[3] == 3)//右
+			{
+				moveFlag[3] = false;
+
+				m_ePosX[3][3] -= 3;
+
+				if (deadFlag[3][3] == true)
+				{
+					bossHP -= 1;
+
+					moveFlag[3] = true;
+					deadFlag[3][3] = false;
+
+					if (bossHP <= 0)
+					{
+						//死亡演出
+					}
+				}
+			}
+			else if (eDirection[3] == 4)//右上
+			{
+				moveFlag[3] = false;
+
+				m_ePosX[4][3] -= 3;
+				m_ePosY[4][3] += 2.455;
+
+				if (deadFlag[4][3] == true)
+				{
+					bossHP -= 1;
+
+					moveFlag[3] = true;
+					deadFlag[4][3] = false;
+
+					if (bossHP <= 0)
+					{
+						//死亡演出
+					}
+				}
+			}
+			else if (eDirection[3] == 5)//右下
+			{
+				moveFlag[3] = false;
+
+				m_ePosX[5][3] -= 3;
+				m_ePosY[5][3] -= 2.455;
+
+				if (deadFlag[5][3] == true)
+				{
+					bossHP -= 1;
+
+					moveFlag[3] = true;
+					deadFlag[5][3] = false;
+
+					if (bossHP <= 0)
+					{
+						//死亡演出
+					}
+				}
+			}
+			else if (eDirection[3] == 6)//左下
+			{
+				moveFlag[3] = false;
+
+				m_ePosX[6][3] += 3;
+				m_ePosY[6][3] -= 2.455;
+
+				if (deadFlag[6][3] == true)
+				{
+					bossHP -= 1;
+
+					moveFlag[3] = true;
+					deadFlag[6][3] = false;
+
+					if (bossHP <= 0)
+					{
+						//死亡演出
+					}
+				}
+			}
+			else if (eDirection[3] == 7)//左上
+			{
+				moveFlag[3] = false;
+
+				m_ePosX[7][3] += 3;
+				m_ePosY[7][3] += 2.455;
+
+				if (deadFlag[7][3] == true)
+				{
+					bossHP -= 1;
+				
+					moveFlag[3] = true;
+					deadFlag[7][3] = false;
+
+					if (bossHP <= 0)
+					{
+						//死亡演出
+					}
+				}
+			}
+		}
+		else
+		{
+			m_ePosX[2][3] += 3;
+
+			count++;
+
+			if (count % 300 == 0)
+			{
+				flag = true;
+				moveFlag[3] = true;
+			}
+		}
+	}
+	
+}
+
 void enemy::draw()
 {
 	Bat++;
@@ -1331,19 +1554,6 @@ void enemy::draw()
 		Mush = 0;
 	}
 
-
-	Death++;
-	if (Death % 5 == 0)
-	{
-		deathAnimation++;
-		if (deathAnimation == 8)
-		{
-			deathAnimation = 0;
-		}
-		Death = 0;
-	}
-
-
 	for (int i = 0; i < DIR; i++)
 	{
 		if (enemyKinds[0] == 0)
@@ -1352,22 +1562,67 @@ void enemy::draw()
 			{
 				DrawRotaGraph(m_ePosX[i][0], m_ePosY[i][0], 1.5, 0, m_skeletonHandle[skeletonAnimation], true, true);
 				DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 0, 0), false);
+				
+				if (dFlag[i][0] == true)
+				{
+					Death++;
+					
+					DrawRotaGraph(deathPosX[i][0], deathPosY[i][0], 1.5, 0, m_skeletonDeathHandle[deathAnimation], true, true);
+					
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][0] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 			if (i == 0 || i == 2)
 			{
 				DrawRotaGraph(m_ePosX[i][0], m_ePosY[i][0], 1.5, 0, m_skeletonHandle[skeletonAnimation], true, false);
 				DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 0, 0), false);
+
+				if (dFlag[i][0] == true)
+				{
+					Death++;
+					DrawRotaGraph(deathPosX[i][0], deathPosY[i][0], 1.5, 0, m_skeletonDeathHandle[deathAnimation], true, false);
+					
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][0] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 
 			if (i == 4 || i == 5)
 			{
 				DrawRotaGraph(m_ePosX[i][0], m_ePosY[i][0], 0.3, 0, m_batHandle[batAnimation], true, true);
 				DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 0, 0), false);
+				if (dFlag[i][0] == true)
+				{
+					dFlag[i][0] = false;
+				}
 			}
 			if (i == 7 || i == 6)
 			{
 				DrawRotaGraph(m_ePosX[i][0], m_ePosY[i][0], 0.3, 0, m_batHandle[batAnimation], true, false);
 				DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 0, 0), false);
+				if (dFlag[i][0] == true)
+				{
+					dFlag[i][0] = false;
+				}
 			}
 
 			
@@ -1378,22 +1633,94 @@ void enemy::draw()
 			{
 				DrawRotaGraph(m_ePosX[i][0], m_ePosY[i][0], 1.5, 0, m_mushHandle[mushAnimation], true, true);
 				DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 0, 0), false);
+
+				if (dFlag[i][0] == true)
+				{
+					Death++;
+					DrawRotaGraph(deathPosX[i][0], deathPosY[i][0], 1.5, 0, m_mushDeathHandle[deathAnimation], true, true);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][0] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 			if (i == 0 || i == 2)
 			{
 				DrawRotaGraph(m_ePosX[i][0], m_ePosY[i][0], 1.5, 0, m_mushHandle[mushAnimation], true, false);
 				DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 0, 0), false);
+
+				if (dFlag[i][0] == true)
+				{
+					Death++;
+					DrawRotaGraph(deathPosX[i][0], deathPosY[i][0], 1.5, 0, m_mushDeathHandle[deathAnimation], true, false);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][0] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 
 			if (i == 4 || i == 5)
 			{
 				DrawRotaGraph(m_ePosX[i][0], m_ePosY[i][0], 2.0, 0, m_eyeHandle[eyeAnimation], true, true);
 				DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 0, 0), false);
+
+				if (dFlag[i][0] == true)
+				{
+					Death++;
+					DrawRotaGraph(deathPosX[i][0], deathPosY[i][0], 1.5, 0, m_eyeDeathHandle[deathAnimation], true, true);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][0] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 			if (i == 7 || i == 6)
 			{
 				DrawRotaGraph(m_ePosX[i][0], m_ePosY[i][0], 2.0, 0, m_eyeHandle[eyeAnimation], true, false);
 				DrawCircle(m_ePosX[i][0], m_ePosY[i][0], m_ePosR, GetColor(255, 0, 0), false);
+				
+				if (dFlag[i][0] == true)
+				{
+					Death++;
+					DrawRotaGraph(deathPosX[i][0], deathPosY[i][0], 1.5, 0, m_eyeDeathHandle[deathAnimation], true, false);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][0] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 		}
 
@@ -1403,22 +1730,70 @@ void enemy::draw()
 			{
 				DrawRotaGraph(m_ePosX[i][1], m_ePosY[i][1], 1.5, 0, m_skeletonHandle[skeletonAnimation], true, true);
 				DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), false);
+				
+				if (dFlag[i][1] == true)
+				{
+					Death++;
+
+					DrawRotaGraph(deathPosX[i][1], deathPosY[i][1], 1.5, 0, m_skeletonDeathHandle[deathAnimation], true, true);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][0] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 			if (i == 0 || i == 2)
 			{
 				DrawRotaGraph(m_ePosX[i][1], m_ePosY[i][1], 1.5, 0, m_skeletonHandle[skeletonAnimation], true, false);
 				DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), false);
+				
+				if (dFlag[i][1] == true)
+				{
+					Death++;
+
+					DrawRotaGraph(deathPosX[i][1], deathPosY[i][1], 1.5, 0, m_skeletonDeathHandle[deathAnimation], true, false);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][0] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 
 			if (i == 4 || i == 5)
 			{
 				DrawRotaGraph(m_ePosX[i][1], m_ePosY[i][1], 0.3, 0, m_batHandle[batAnimation], true, true);
 				DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), false);
+
+				if (dFlag[i][1] == true)
+				{
+					dFlag[i][1] = false;
+				}
 			}
 			if (i == 7 || i == 6)
 			{
 				DrawRotaGraph(m_ePosX[i][1], m_ePosY[i][1], 0.3, 0, m_batHandle[batAnimation], true, false);
-				DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), false);
+				DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), false); 
+
+				if (dFlag[i][1] == true)
+				{
+					dFlag[i][1] = false;
+				}
 			}
 		}
 		else if (enemyKinds[1] == 1)
@@ -1427,22 +1802,98 @@ void enemy::draw()
 			{
 				DrawRotaGraph(m_ePosX[i][1], m_ePosY[i][1], 1.5, 0, m_mushHandle[mushAnimation], true, true);
 				DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), false);
+				
+				if (dFlag[i][1] == true)
+				{
+					Death++;
+
+					DrawRotaGraph(deathPosX[i][1], deathPosY[i][1], 1.5, 0, m_mushDeathHandle[deathAnimation], true, true);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][1] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 			if (i == 0 || i == 2)
 			{
 				DrawRotaGraph(m_ePosX[i][1], m_ePosY[i][1], 1.5, 0, m_mushHandle[mushAnimation], true, false);
 				DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), false);
+
+				if (dFlag[i][1] == true)
+				{
+					Death++;
+
+					DrawRotaGraph(deathPosX[i][1], deathPosY[i][1], 1.5, 0, m_skeletonDeathHandle[deathAnimation], true, false);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][1] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 
 			if (i == 4 || i == 5)
 			{
 				DrawRotaGraph(m_ePosX[i][1], m_ePosY[i][1], 2.0, 0, m_eyeHandle[eyeAnimation], true, true);
 				DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), false);
+
+				if (dFlag[i][1] == true)
+				{
+					Death++;
+
+					DrawRotaGraph(deathPosX[i][1], deathPosY[i][1], 1.5, 0, m_eyeDeathHandle[deathAnimation], true, true);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][1] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 			if (i == 7 || i == 6)
 			{
 				DrawRotaGraph(m_ePosX[i][1], m_ePosY[i][1], 2.0, 0, m_eyeHandle[eyeAnimation], true, false);
 				DrawCircle(m_ePosX[i][1], m_ePosY[i][1], m_ePosR, GetColor(255, 0, 0), false);
+
+				if (dFlag[i][1] == true)
+				{
+					Death++;
+
+					DrawRotaGraph(deathPosX[i][1], deathPosY[i][1], 1.5, 0, m_eyeDeathHandle[deathAnimation], true, false);
+
+					if (Death % 5 == 0)
+					{
+						deathAnimation++;
+
+						if (deathAnimation == 4)
+						{
+							deathAnimation = 0;
+							dFlag[i][1] = false;
+						}
+						Death = 0;
+					}
+				}
 			}
 		}
 
