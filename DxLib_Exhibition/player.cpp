@@ -212,26 +212,33 @@ void player::shot(enemy &Enemy)
 		//弾とエネミーの当たり判定
 		for (int i = 0; i < ENEMY; i++)
 		{
-			float dx = m_sPosX - Enemy.m_ePosX[Enemy.eDirection[i]][i];
-			float dy = m_sPosY - Enemy.m_ePosY[Enemy.eDirection[i]][i];
-			float dr = dx * dx + dy * dy;
-
-			float ar = m_sPosR + Enemy.m_ePosR;
-			float dl = ar * ar;
-
-			if (dr < dl)
+			for (int j = 0; j < 2; j++)
 			{
-				hitFlag = true;
-				
-				Enemy.deadFlag[Enemy.eDirection[i]][i] = true;
+				float dx = m_sPosX - Enemy.m_ePosX[Enemy.eDirection[i]][i];
+				float dy = m_sPosY - Enemy.m_ePosY[Enemy.eDirection[i]][i];
+				float dr = dx * dx + dy * dy;
 
-				hitPosX = m_sPosX;
-				hitPosY = m_sPosY;
+				float ar = m_sPosR + Enemy.m_ePosR;
+				float dl = ar * ar;
 
-				shotFlag = false;
-				moveFlag = true;
-				m_sPosX = m_posX;
-				m_sPosY = m_posY;
+				if (dr < dl)
+				{
+					hitFlag = true;
+
+					Enemy.dFlag[Enemy.eDirection[i]][i] = true;
+					Enemy.deathPosX[Enemy.eDirection[i]][i] = Enemy.m_ePosX[Enemy.eDirection[i]][i];
+					Enemy.deathPosY[Enemy.eDirection[i]][i] = Enemy.m_ePosY[Enemy.eDirection[i]][i];
+
+					Enemy.deadFlag[Enemy.eDirection[i]][i] = true;
+
+					hitPosX = m_sPosX;
+					hitPosY = m_sPosY;
+
+					shotFlag = false;
+					moveFlag = true;
+					m_sPosX = m_posX;
+					m_sPosY = m_posY;
+				}
 			}
 		}
 
@@ -323,7 +330,7 @@ void player::shot(enemy &Enemy)
 			if (dr < dl)
 			{
 				Enemy.deadFlag[Enemy.eDirection[i]][i] = true;
-
+				
 				shotFlag = false;
 				moveFlag = true;
 				m_sPosX = m_posX;
@@ -405,11 +412,11 @@ void player::draw(torch &Torch)
 	if (hitFlag == true)
 	{
 		Hit++;
+		DrawRotaGraph(hitPosX, hitPosY, 2.0, 0, m_hitHandle[hitAnimation], true, false);
+		
 		if (Hit % 2 == 0)
 		{
 			hitAnimation++;
-
-			DrawRotaGraph(hitPosX, hitPosY, 2.0, 0, m_hitHandle[hitAnimation], true, false);
 			
 			if (hitAnimation == 8)
 			{
