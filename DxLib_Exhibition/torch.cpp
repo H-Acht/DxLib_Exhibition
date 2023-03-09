@@ -7,9 +7,9 @@ torch::torch() :
 	m_tPosY(),
 	m_tPosR(),
 	burnFlag(),
-	R(255),
-	G(255),
-	B(255),
+	R(0),
+	G(0),
+	B(0),
 	torchCount(4)
 {
 }
@@ -55,14 +55,15 @@ void torch::update(enemy &Enemy)
 			float dl = ar * ar;
 			if (dr < dl)
 			{
-				Enemy.deadFlag[Enemy.eDirection[j]][j] = true;
+				Enemy.deadFlag[Enemy.eDirection[j]][j] = true; // ‚½‚¢‚Ü‚Â‚É“–‚½‚Á‚½ŽžAŒ‚”j”‚ª‘‚¦‚éƒoƒO
+				Enemy.deadCount--; // ª‚Ì‰¼C³
 				burnFlag[i] = false;
 
 				torchCount--;
 
-				R -= 40;
-				G -= 40;
-				B -= 40;
+				R -= 30;
+				G -= 30;
+				B -= 30;
 			}
 		}
 		if (burnFlag[i] == false)
