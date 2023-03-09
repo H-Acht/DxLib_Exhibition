@@ -4,10 +4,8 @@
 class SceneTitle : public SceneBase
 {
 public:
-	SceneTitle()
-	{
-		m_isEnd = false;
-	}
+	SceneTitle();
+	
 	virtual ~SceneTitle() {}
 
 	virtual void init() override;
@@ -20,4 +18,19 @@ public:
 private:
 
 	bool m_isEnd;
+
+	bool brightFlag;
+
+	int rgb;
+
+	int select;
+
+	int textPosX;
+	int textPosX2;
+	int textPosX3;
+
+	int circlePosY;
+
+	int prev;
+
 };
