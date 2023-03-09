@@ -149,8 +149,11 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="SceneBase.cpp" />
+    <ClCompile Include="SceneClear.cpp" />
+    <ClCompile Include="SceneGameover.cpp" />
     <ClCompile Include="SceneMain.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneRule.cpp" />
     <ClCompile Include="SceneTitle.cpp" />
     <ClCompile Include="ScoreBoard.cpp" />
     <ClCompile Include="torch.cpp" />
@@ -161,8 +164,11 @@
     <ClInclude Include="game.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="SceneBase.h" />
+    <ClInclude Include="SceneClear.h" />
+    <ClInclude Include="SceneGameover.h" />
     <ClInclude Include="SceneMain.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneRule.h" />
     <ClInclude Include="SceneTitle.h" />
     <ClInclude Include="ScoreBoard.h" />
     <ClInclude Include="torch.h" />
