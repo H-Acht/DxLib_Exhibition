@@ -17,8 +17,6 @@ public:
 	void update5(player& Player);
 	void update6(player& Player);
 
-	void updateBoss(player& Player);
-
 	void draw();
 
 	float m_ePosX[DIR][ENEMY]; //[•ûŒü][”Ô†]
@@ -65,12 +63,4 @@ private:
 	int deathAnimation;
 	int Death;
 
-	int zakoHP;
-	bool zako;
-
-	int bossHP;
-
-	int count;
-
-	bool flag;
 };
