@@ -18,11 +18,10 @@ player::player() :
 	m_sPosR(0),
 	m_drawPosX(0),
 	m_drawPosY(0),
-	shotFlag(false),
+	shotFlag(),
 	moveFlag(false),
 	pHP(0),
 	damageFlag(false),
-	weapon(0),
 	push(0),
 	m_shotHandle(),
 	Shot(0),
@@ -33,8 +32,17 @@ player::player() :
 	hitFlag(false),
 	hitPosX(0),
 	hitPosY(0),
-	m_hitHandle()
-
+	m_hitHandle(),
+	bombFlag(false),
+	m_bPosX(),
+	m_bPosY(),
+	bPI(),
+	num(1),
+	damageEffect(false),
+	Bomb(0),
+	m_bombHandle(),
+	bombAnimation(0),
+	remainingBomb(0)
 {
 }
 
@@ -48,6 +56,10 @@ player::~player()
 	{
 		DeleteGraph(m_shotHandle[i]);
 	}
+	for (int i = 0; i < 45; i++)
+	{
+		DeleteGraph(m_bombHandle[i]);
+	}
 }
 
 void player::init()
@@ -60,15 +72,24 @@ void player::init()
 	m_drawPosY = m_posY - 10;
 
 	shotFlag = false;
+	
+	remainingBomb = 3;
+
 	m_sPosX = m_posX;
 	m_sPosY = m_posY;
 	m_sPosR = 8;
-
+	
+	for (int i = 0; i < 8; i++)
+	{
+		m_bPosX[i] = m_posX;
+		m_bPosY[i] = m_posY;
+	}
 	moveFlag = true;
 
 	pHP = 3;
 	LoadDivGraph("Data/ShotEffect.png", 21, 21, 1, 100, 100, m_shotHandle);
 	LoadDivGraph("Data/HitEffect.png", 8, 8, 1, 32, 32, m_hitHandle);
+	LoadDivGraph("Data/BombEffect.png", 45, 45, 1, 64, 64, m_bombHandle);
 }
 
 void player::update()
@@ -119,209 +140,194 @@ void player::update()
 		}
 	}
 
-	if (padState & PAD_INPUT_2) //武器チェンジ
+	if (damageFlag == true)
 	{
-		if (push == 0)
-		{
-			if (weapon == 0)
-			{
-				weapon = 1;
-			}
-			else if (weapon == 1)
-			{
-				weapon = 0;
-			}
-		}
-		push = 1;
-	}
-	else
-	{
-		push = 0;
+		pHP--;
+		damageEffect = true;
+		damageFlag = false;
 	}
 }
 
-void player::shot(enemy &Enemy)
+void player::shot(enemy& Enemy)
 {
 	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-	
+
 	//1ボタンでショット
-	if (weapon == 0)
+	if (padState & PAD_INPUT_1)
 	{
-		if (padState & PAD_INPUT_1)
+		if (shotFlag == false)
 		{
-			if (shotFlag == false)
-			{
-				shotFlag = true;
-				moveFlag = false;
-			}
+			shotFlag = true;
+			moveFlag = false;
 		}
-		if (shotFlag == true)
+	}
+	if (shotFlag == true)
+	{
+		if (prev == 0)
 		{
-			if (prev == 0)
-			{
-				m_sPosY -= 16;
-				
-				PI = 4.7;
-			}
-			else if (prev == 1)
-			{
-				m_sPosY += 16;
-				
-				PI = 1.5;
-			}
-			else if (prev == 2)
-			{
-				m_sPosX -= 16;
-				
-				PI = 3.14;
-			}
-			else if (prev == 3)
-			{
-				m_sPosX += 16;
-				
-				PI = 0;
-			}
-			else if (prev == 4)
-			{
-				m_sPosX += 10;
-				m_sPosY -= 8.182;	//(16 : 9) = (10 : 5.6)
+			m_sPosY -= 16;
 
-				PI = 5.3;
-			}
-			else if (prev == 5)
-			{
-				m_sPosX += 10;
-				m_sPosY += 8.182;
-
-				PI = 0.7;
-			}
-			else if (prev == 6)
-			{
-				m_sPosX -= 10;
-				m_sPosY += 8.182;
-				PI = 2.3;
-			}
-			else if (prev == 7)
-			{
-				m_sPosX -= 10;
-				m_sPosY -= 8.182;
-				PI = 3.7;
-			}
+			PI = 4.7;
 		}
-
-		//弾とエネミーの当たり判定
-		for (int i = 0; i < ENEMY; i++)
+		else if (prev == 1)
 		{
-			for (int j = 0; j < 2; j++)
-			{
-				float dx = m_sPosX - Enemy.m_ePosX[Enemy.eDirection[i]][i];
-				float dy = m_sPosY - Enemy.m_ePosY[Enemy.eDirection[i]][i];
-				float dr = dx * dx + dy * dy;
+			m_sPosY += 16;
 
-				float ar = m_sPosR + Enemy.m_ePosR;
-				float dl = ar * ar;
-
-				if (dr < dl)
-				{
-					hitFlag = true;
-
-					Enemy.dFlag[Enemy.eDirection[i]][i] = true;
-					Enemy.deathPosX[Enemy.eDirection[i]][i] = Enemy.m_ePosX[Enemy.eDirection[i]][i];
-					Enemy.deathPosY[Enemy.eDirection[i]][i] = Enemy.m_ePosY[Enemy.eDirection[i]][i];
-
-					Enemy.deadFlag[Enemy.eDirection[i]][i] = true;
-
-					hitPosX = m_sPosX;
-					hitPosY = m_sPosY;
-
-					shotFlag = false;
-					moveFlag = true;
-					m_sPosX = m_posX;
-					m_sPosY = m_posY;
-				}
-			}
+			PI = 1.5;
 		}
-
-		// 画面外に出てしまった場合
-		if (m_sPosY < 0 || m_sPosY > Game::kScreenHeight ||
-			m_sPosX < 500 || m_sPosX > Game::kScreenWidth)
+		else if (prev == 2)
 		{
+			m_sPosX -= 16;
+
+			PI = 3.14;
+		}
+		else if (prev == 3)
+		{
+			m_sPosX += 16;
+
+			PI = 0;
+		}
+		else if (prev == 4)
+		{
+			m_sPosX += 16;
+			m_sPosY -= 13.091;
+
+			PI = 5.3;
+		}
+		else if (prev == 5)
+		{
+			m_sPosX += 16;
+			m_sPosY += 13.091;
+
+			PI = 0.7;
+		}
+		else if (prev == 6)
+		{
+			m_sPosX -= 16;
+			m_sPosY += 13.091;
+			PI = 2.3;
+		}
+		else if (prev == 7)
+		{
+			m_sPosX -= 16;
+			m_sPosY -= 13.091;
+			PI = 3.7;
+		}
+	}
+
+	//弾とエネミーの当たり判定
+	for (int i = 0; i < ENEMY; i++)
+	{
+		float dx = m_sPosX - Enemy.m_ePosX[Enemy.eDirection[i]][i];
+		float dy = m_sPosY - Enemy.m_ePosY[Enemy.eDirection[i]][i];
+		float dr = dx * dx + dy * dy;
+
+		float ar = m_sPosR + Enemy.m_ePosR;
+		float dl = ar * ar;
+
+		if (dr < dl)
+		{
+			hitFlag = true;
+
+			Enemy.dFlag[Enemy.eDirection[i]][i] = true;
+			Enemy.deathPosX[Enemy.eDirection[i]][i] = Enemy.m_ePosX[Enemy.eDirection[i]][i];
+			Enemy.deathPosY[Enemy.eDirection[i]][i] = Enemy.m_ePosY[Enemy.eDirection[i]][i];
+
+			Enemy.deadFlag[Enemy.eDirection[i]][i] = true;
+
+			hitPosX = m_sPosX;
+			hitPosY = m_sPosY;
+
 			shotFlag = false;
 			moveFlag = true;
 			m_sPosX = m_posX;
 			m_sPosY = m_posY;
 		}
+	}
 
-		if (damageFlag == true)
+	// 画面外に出てしまった場合
+	if (m_sPosY < 0 || m_sPosY > Game::kScreenHeight ||
+		m_sPosX < 500 || m_sPosX > Game::kScreenWidth)
+	{
+		shotFlag = false;
+		moveFlag = true;
+		m_sPosX = m_posX;
+		m_sPosY = m_posY;
+	}
+}
+
+void player::bomb(enemy& Enemy)
+{
+	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+
+	//2ボタンでボム
+	if (remainingBomb > 0)
+	{
+		if (padState & PAD_INPUT_2)
 		{
-			pHP--;
-			damageFlag = false;
+			if (push == 0)
+			{
+				if (bombFlag == false)
+				{
+					bombFlag = true;
+					moveFlag = false;
+					remainingBomb -= 1;
+				}
+			}
+			push = 1;
+		}
+		else
+		{
+			push = 0;
 		}
 	}
 
-	if (weapon == 1) //武器2
+	if (bombFlag == true)
 	{
-		if (padState & PAD_INPUT_1)
-		{
-			if (shotFlag == false)
-			{
-				shotFlag = true;
-				moveFlag = false;
-			}
-		}
-		if (shotFlag == true)
-		{
-			if (prev == 0)
-			{
-				m_sPosY -= 16;
-				PI = 4.7;
-			}
-			else if (prev == 1)
-			{
-				m_sPosY += 16;
-				PI = 1.5;
-			}
-			else if (prev == 2)
-			{
-				m_sPosX -= 16;
-				PI = 3.14;
-			}
-			else if (prev == 3)
-			{
-				m_sPosX += 16;
-				PI = 0;
-			}
-			else if (prev == 4)
-			{
-				m_sPosX += 10;
-				m_sPosY -= 8.182;	//(16 : 9) = (10 : 5.6)
-				PI = 5.3;
-			}
-			else if (prev == 5)
-			{
-				m_sPosX += 10;
-				m_sPosY += 8.182;
-				PI = 0.7;
-			}
-			else if (prev == 6)
-			{
-				m_sPosX -= 10;
-				m_sPosY += 8.182;
-				PI = 2.3;
-			}
-			else if (prev == 7)
-			{
-				m_sPosX -= 10;
-				m_sPosY -= 8.182;
-				PI = 3.7;
-			}
-		}
+		m_bPosY[0] -= 6;
+		bPI[0] = 4.7;
 
-		//弾とエネミーの当たり判定
-		for (int i = 0; i < ENEMY; i++)
+		m_bPosY[1] += 6;
+		bPI[1] = 1.5;
+
+		m_bPosX[2] -= 7;
+		bPI[2] = 3.14;
+
+		m_bPosX[3] += 7;
+		bPI[3] = 0;
+
+		m_bPosX[4] += 7;
+		m_bPosY[4] -= 5.727;
+		bPI[4] = 5.3;
+
+		m_bPosX[5] += 7;
+		m_bPosY[5] += 5.727;
+		bPI[5] = 0.7;
+
+		m_bPosX[6] -= 7;
+		m_bPosY[6] += 5.727;
+		bPI[6] = 2.3;
+
+		m_bPosX[7] -= 7;
+		m_bPosY[7] -= 5.727;
+		bPI[7] = 3.7;
+	}
+	else
+	{
+		for (int i = 0; i < 8; i++)
 		{
-			float dx = m_sPosX - Enemy.m_ePosX[Enemy.eDirection[i]][i];
-			float dy = m_sPosY - Enemy.m_ePosY[Enemy.eDirection[i]][i];
+			m_bPosX[i] = m_posX;
+			m_bPosY[i] = m_posY;
+		}
+	}
+
+	//ボム当たり判定
+	for (int i = 0; i < ENEMY; i++)
+	{
+		for (int b = 0; b < 8; b++)
+		{
+			float dx = m_bPosX[b] - Enemy.m_ePosX[Enemy.eDirection[i]][i];
+			float dy = m_bPosY[b] - Enemy.m_ePosY[Enemy.eDirection[i]][i];
 			float dr = dx * dx + dy * dy;
 
 			float ar = m_sPosR + Enemy.m_ePosR;
@@ -329,31 +335,39 @@ void player::shot(enemy &Enemy)
 
 			if (dr < dl)
 			{
+				hitFlag = true;
+
+				Enemy.dFlag[Enemy.eDirection[i]][i] = true;
+				Enemy.deathPosX[Enemy.eDirection[i]][i] = Enemy.m_ePosX[Enemy.eDirection[i]][i];
+				Enemy.deathPosY[Enemy.eDirection[i]][i] = Enemy.m_ePosY[Enemy.eDirection[i]][i];
+
 				Enemy.deadFlag[Enemy.eDirection[i]][i] = true;
-				
-				shotFlag = false;
-				moveFlag = true;
-				m_sPosX = m_posX;
-				m_sPosY = m_posY;
+
+				hitPosX = m_bPosX[b];
+				hitPosY = m_bPosY[b];
+
 			}
-		}
 
-		// 画面外に出てしまった場合
-		if (m_sPosY < 0 || m_sPosY > Game::kScreenHeight ||
-			m_sPosX < 500 || m_sPosX > Game::kScreenWidth)
-		{
-			shotFlag = false;
-			moveFlag = true;
-			m_sPosX = m_posX;
-			m_sPosY = m_posY;
-		}
+			//ボムが外に出たら
+			if (m_bPosY[b] < 0 || m_bPosY[b] > Game::kScreenHeight ||
+				m_bPosX[b] < 500 || m_bPosX[b] > Game::kScreenWidth)
+			{
+				bombFlag = false;
+				moveFlag = true;
+			}
 
-		if (damageFlag == true)
-		{
-			pHP--;
-			damageFlag = false;
 		}
 	}
+
+	if (Enemy.deadCount % (30 * num) == 0)
+	{
+		if (remainingBomb < 3)
+		{
+			remainingBomb += 1;
+			num += 1;
+		}
+	}
+
 }
 
 void player::draw(torch &Torch)
@@ -363,11 +377,22 @@ void player::draw(torch &Torch)
 	if (Shot % 2 == 0)
 	{
 		shotAnimation++;
-		if (shotAnimation == 8)
+		if (shotAnimation == 21)
 		{
 			shotAnimation = 0;
 		}
 		Shot = 0;
+	}
+
+	Bomb++;
+	if (Bomb % 2 == 0)
+	{
+		bombAnimation++;
+		if (bombAnimation == 45)
+		{
+			bombAnimation = 0;
+		}
+		Bomb = 0;
 	}
 
 	if (prev == 0)
@@ -409,6 +434,15 @@ void player::draw(torch &Torch)
 		DrawRotaGraph(m_sPosX, m_sPosY, 1.0, PI, m_shotHandle[shotAnimation], true, false);
 	}
 	
+	if (bombFlag == true)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			DrawCircle(m_bPosX[i], m_bPosY[i], m_sPosR, GetColor(255, 255, 255), false);
+			DrawRotaGraph(m_bPosX[i], m_bPosY[i], 1.0, bPI[i], m_bombHandle[shotAnimation], true, false);
+		}
+	}
+	
 	if (hitFlag == true)
 	{
 		Hit++;
@@ -427,11 +461,11 @@ void player::draw(torch &Torch)
 		}
 	}
 
-#endif
-
-	SetDrawBright(Torch.R, Torch.G, Torch.B);
-
-#if true
+	if (damageEffect == true)
+	{
+		DrawBox(0, 0, 1600, 900, GetColor(255, 0, 0), true);
+		damageEffect = false;
+	}
 
 #endif
 }

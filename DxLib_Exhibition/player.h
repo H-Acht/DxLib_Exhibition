@@ -14,6 +14,7 @@ public:
 	void init();
 	void update();
 	void shot(enemy& Enemy);
+	void bomb(enemy& Enemy);
 	void draw(torch& Torch);
 
 
@@ -31,7 +32,8 @@ public:
 	int pHP;
 	int prev;
 
-	int weapon;
+	int remainingBomb;
+
 
 private:
 	//ƒvƒŒƒCƒ„[‚ÌŒü‚¢‚Ä‚¢‚é•ûŒü
@@ -50,17 +52,27 @@ private:
 
 	bool moveFlag;
 
+	bool bombFlag;
+	float m_bPosX[8];
+	float m_bPosY[8];
+
 	int m_shotHandle[21];
 	
 	int m_hitHandle[8];
 
+	int m_bombHandle[45];
+
 	int Shot;
 	int shotAnimation;
+
+	int Bomb;
+	int bombAnimation;
 
 	int Hit;
 	int hitAnimation;
 
 	float PI;
+	float bPI[8];
 
 	int push;
 
@@ -68,4 +80,8 @@ private:
 
 	float hitPosX;
 	float hitPosY;
+
+	int num;
+
+	bool damageEffect;
 };
