@@ -1,27 +1,27 @@
 #include "game.h"
 
 #include "SceneMain.h"
-
+#include "SceneTitle.h"
 #include "player.h"
 #include "enemy.h"
 #include "torch.h"
 #include "ScoreBoard.h"
+#include "SceneClear.h"
+#include "SceneGameover.h"
 
 SceneMain::SceneMain() :
-	num(1),
-	select(0),
-	textPosX(0),
-	textPosX2(0),
-	textPosX3(0),
-	circlePosY(0),
-	prev(0)
+	m_isEnd(false),
+	rgb(0),
+	brightFlag(true),
+	num(0),
+	gameoverEffect(false)
 {
-	m_isEnd = false;
-
 	m_pPlayer = new player;
 	m_pEnemy = new enemy;
 	m_pTorch = new torch;
 	m_pScore = new ScoreBoard;
+
+	m_isEnd = false;
 }
 
 SceneMain::~SceneMain()
@@ -43,259 +43,113 @@ void SceneMain::init()
 	m_pEnemy->init(*m_pPlayer);
 	m_pTorch->init(*m_pPlayer);
 	m_pScore->init();
-
-	textPosX = 200;
-	textPosX2 = 200;
-	textPosX3 = 200;
-
-	circlePosY = 270;
-
-	m_pTorch->R = 255;
-	m_pTorch->G = 255;
-	m_pTorch->B = 255;
 }
 
 SceneBase* SceneMain::update()
 {
+	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+
 	switch (num)
 	{
 	case 0:
-		SceneMain::init();
-		gameoverUpdate();
-		gameoverDraw();
+		m_pTorch->R += 5;
+		m_pTorch->G += 5;
+		m_pTorch->B += 5;
+		if (m_pTorch->B >= 255)
+		{
+			num = 1;
+		}
 		break;
 	case 1:
-		mainUpdate1();
-		mainDraw1();
-		break;
-	case 2:
-		SceneMain::init();
-		clearUpdate1();
-		clearDraw1();
+		m_pPlayer->update();
+		m_pPlayer->shot(*m_pEnemy);
+		m_pPlayer->bomb(*m_pEnemy);
+		m_pTorch->update(*m_pEnemy);
+		
+		if (padState & PAD_INPUT_4)
+		{
+			m_pEnemy->deadCount += 2;
+		}
+
+		if (m_pEnemy->deadCount < 20)
+		{
+			m_pEnemy->update1(*m_pPlayer);	//上左右、右上、左上
+		}
+		if (m_pEnemy->deadCount >= 20 && m_pEnemy->deadCount < 40)
+		{
+			m_pEnemy->update2(*m_pPlayer);  //八方向
+		}
+		if (m_pEnemy->deadCount >= 40 && m_pEnemy->deadCount < 70)
+		{
+			m_pEnemy->update3(*m_pPlayer); //上下左右から確率で早い敵
+		}
+		if (m_pEnemy->deadCount >= 70 && m_pEnemy->deadCount < 100)
+		{
+			m_pEnemy->update4(*m_pPlayer); //八方向から確率で早い敵
+		}
+		if (m_pEnemy->deadCount >= 100 && m_pEnemy->deadCount < 150)
+		{
+			m_pEnemy->update5(*m_pPlayer); //八方向から敵が二体同時に向かってくる
+		}
+		if (m_pEnemy->deadCount >= 150 && m_pEnemy->deadCount < 230)
+		{
+			m_pEnemy->update6(*m_pPlayer); //八方向から敵が三体同時に向かってくる
+		}
+
+		if (m_pEnemy->deadCount >= 230)
+		{
+			m_pTorch->R -= 5;
+			m_pTorch->G -= 5;
+			m_pTorch->B -= 5;
+			if (m_pTorch->R <= 0 && m_pTorch->G <= 0 && m_pTorch->B <= 0)
+			{
+				return (new SceneClear);
+			}
+		}
+
+		if (m_pPlayer->pHP == 0)
+		{
+			gameoverEffect = true;
+
+			m_pTorch->R -= 4;
+			m_pTorch->G -= 4;
+			m_pTorch->B -= 4;
+			if (m_pTorch->R <= 0 && m_pTorch->G <= 0 && m_pTorch->B <= 0)
+			{
+				return (new SceneGameover);
+			}
+		}
+
+		if(m_pTorch->torchCount == 0)
+		{
+			m_pTorch->R -= 4;
+			m_pTorch->G -= 4;
+			m_pTorch->B -= 4;
+			if (m_pTorch->R <= 0 && m_pTorch->G <= 0 && m_pTorch->B <= 0)
+			{
+				return (new SceneGameover);
+			}
+		}
+
 		break;
 	default:
 		break;
 	}
+
 	return this;
 }
 
 void SceneMain::draw()
 {
-}
+	SetDrawBright(m_pTorch->R, m_pTorch->G, m_pTorch->B);
 
-void SceneMain::gameoverUpdate()
-{
-	m_pPlayer->pHP = 3;
-	for (int i = 0; i < TORCH; i++)
-	{
-		m_pTorch->burnFlag[i] = true;
-	}
-
-	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-
-	static int push = 0;
-
-
-	if (padState & PAD_INPUT_2)
-	{
-		if (push == 0)
-		{
-			num = 1;
-		}
-		push = 1;
-	}
-	else
-	{
-		push = 0;
-	}
-
-
-}
-
-void SceneMain::gameoverDraw()
-{
-	SetDrawBright(255, 255, 255);
-
-	DrawString(200, 200, "ゲームオーバー", GetColor(255, 255, 255));
-	DrawString(200, 250, "やり直す -> ボタン2", GetColor(255, 255, 255));
-}
-
-void SceneMain::mainUpdate1()
-{
-	m_pPlayer->update();
-	m_pPlayer->shot(*m_pEnemy);
-	m_pTorch->update(*m_pEnemy);
-
-	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-	if (padState & PAD_INPUT_4)
-	{
-		m_pEnemy->deadCount += 2;
-	}
-
-	if (m_pEnemy->deadCount <= 20)
-	{
-		m_pEnemy->update1(*m_pPlayer);
-	}
-	if (m_pEnemy->deadCount >= 20 && m_pEnemy->deadCount <= 40)
-	{
-		m_pEnemy->update2(*m_pPlayer);
-	}
-	if (m_pEnemy->deadCount >= 40 && m_pEnemy->deadCount <= 70)
-	{
-		m_pEnemy->update3(*m_pPlayer);
-	}
-	if (m_pEnemy->deadCount >= 70 && m_pEnemy->deadCount <= 100)
-	{
-		m_pEnemy->update4(*m_pPlayer);
-	}
-	if (m_pEnemy->deadCount >= 100 && m_pEnemy->deadCount <= 140)
-	{
-		m_pEnemy->update5(*m_pPlayer);
-	}
-
-	if (m_pPlayer->pHP <= 0 || m_pTorch->torchCount == 0)
-	{
-		num = 0;
-	}
-}
-
-void SceneMain::mainDraw1()
-{
 	m_pPlayer->draw(*m_pTorch);
 	m_pEnemy->draw();
 	m_pTorch->draw();
 	m_pScore->draw(*m_pPlayer, *m_pEnemy, *m_pTorch);
-}
 
-void SceneMain::clearUpdate1()
-{
-	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
-
-	m_pEnemy->deadCount = 0;
-
-	prev = select;
-
-	if (prev == 0)
+	if (gameoverEffect == true)
 	{
-		textPosX = 250;
-		textPosX2 = 200;
-		textPosX3 = 200;
-
-		circlePosY = 250;
-
-		static int push = 0;
-
-		if (padState & PAD_INPUT_DOWN)
-		{
-			if (push == 0)
-			{
-				select = 1;
-			}
-			push = 1;
-		}
-		else if(padState & PAD_INPUT_UP)
-		{
-			if (push == 0)
-			{
-				select = 2;
-			}
-			push = 1;
-		}
-		else
-		{
-			push = 0;
-		}
-
-		if (padState & PAD_INPUT_2)
-		{
-			num = 3;
-		}
+		DrawBox(0, 0, 1600, 900, GetColor(255, 0, 0), true);
 	}
-	if (prev == 1)
-	{
-		textPosX = 200;
-		textPosX2 = 250;
-		textPosX3 = 200;
-
-		circlePosY = 300;
-
-		static int push = 0;
-
-		if (padState & PAD_INPUT_UP)
-		{
-			if (push == 0)
-			{
-				select = 0;
-			}
-			push = 1;
-		}
-		else if (padState & PAD_INPUT_DOWN)
-		{
-			if (push == 0)
-			{
-				select = 2;
-			}
-			push = 1;
-		}
-		else
-		{
-			push = 0;
-		}
-
-		if (padState & PAD_INPUT_2)
-		{
-			num = 1;
-		}
-	}
-
-	if (prev == 2)
-	{
-		textPosX = 200;
-		textPosX2 = 200;
-		textPosX3 = 250;
-
-		circlePosY = 350;
-
-		static int push = 0;
-
-		if (padState & PAD_INPUT_UP)
-		{
-			if (push == 0)
-			{
-				select = 1;
-			}
-			push = 1;
-		}
-		else if (padState & PAD_INPUT_DOWN)
-		{
-			if (push == 0)
-			{
-				select = 0;
-			}
-			push = 1;
-		}
-		else
-		{
-			push = 0;
-		}
-
-		if (padState & PAD_INPUT_2)
-		{
-			num = -1;
-		}
-	}
-}
-
-void SceneMain::clearDraw1()
-{
-	SetDrawBright(255, 255, 255);
-
-	DrawString(200, 200, "ステージ1クリア", GetColor(255, 255, 255));
-
-	DrawCircle(200, circlePosY, 10, GetColor(255, 0, 0), true);
-	DrawString(textPosX, 250, "次のステージへ", GetColor(255, 255, 255));
-	DrawString(textPosX2, 300, "もう一度同じステージへ", GetColor(255, 255, 255));
-	DrawString(textPosX3, 350, "ショップへ", GetColor(255, 255, 255));
-
-	DrawFormatString(200, 500, GetColor(255, 255, 255), "現在 %d", select);
 }

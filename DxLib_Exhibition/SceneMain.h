@@ -18,16 +18,6 @@ public:
 	virtual SceneBase* update() override;
 	virtual void draw() override;
 
-	virtual void gameoverUpdate();
-	virtual void gameoverDraw();
-
-	virtual void mainUpdate1();
-	virtual void mainDraw1();
-
-	virtual void clearUpdate1();
-	virtual void clearDraw1();
-
-
 	virtual bool isEnd() { return m_isEnd; }
 
 private:
@@ -37,17 +27,13 @@ private:
 	torch* m_pTorch;
 	ScoreBoard* m_pScore;
 	
-	int num;
-
 	bool m_isEnd;
 
-	int select;
+	int rgb;
+
+	bool brightFlag;
 	
-	int textPosX;
-	int textPosX2;
-	int textPosX3;
+	int num;
 
-	int circlePosY;
-
-	int prev;
+	bool gameoverEffect;
 };
