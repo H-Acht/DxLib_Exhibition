@@ -131,7 +131,7 @@ void player::update()
 			prev = m_dir;
 
 			CrosshairX = m_posX;
-			CrosshairY = m_posY - 60;
+			CrosshairY = m_posY - 70;
 
 		}
 		//下
@@ -141,7 +141,7 @@ void player::update()
 			prev = m_dir;
 
 			CrosshairX = m_posX;
-			CrosshairY = m_posY + 60;
+			CrosshairY = m_posY + 70;
 
 		}
 		//左
@@ -150,7 +150,7 @@ void player::update()
 			m_dir = 2;
 			prev = m_dir;
 
-			CrosshairX = m_posX - 60;
+			CrosshairX = m_posX - 70;
 			CrosshairY = m_posY;
 
 		}
@@ -160,7 +160,7 @@ void player::update()
 			m_dir = 3;
 			prev = m_dir;
 
-			CrosshairX = m_posX + 60;
+			CrosshairX = m_posX + 70;
 			CrosshairY = m_posY;
 
 		}
@@ -479,7 +479,6 @@ void player::draw(torch &Torch)
 
 	if (shotFlag == true) //ショットアニメーション
 	{
-		DrawCircle(m_sPosX, m_sPosY, m_sPosR, GetColor(255, 255, 255), false);
 		DrawRotaGraph(m_sPosX, m_sPosY, 1.0, PI, m_shotHandle[shotAnimation], true, false);
 	}
 
@@ -489,9 +488,6 @@ void player::draw(torch &Torch)
 		{
 			//ボムアニメーション
 			DrawRotaGraph(m_bPosX[i], m_bPosY[i], 1.0, bPI[i], m_bombHandle[bombAnimation], true, false);
-#ifdef _DEBUG
-			DrawCircle(m_bPosX[i], m_bPosY[i], m_sPosR, GetColor(255, 255, 255), false);
-#endif
 		}
 	}
 

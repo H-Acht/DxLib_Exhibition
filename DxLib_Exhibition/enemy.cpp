@@ -1997,7 +1997,7 @@ void enemy::draw()
 	}
 
 	Portal++;
-	if (Portal % 5 == 0)
+	if (Portal % 3 == 0)
 	{
 		portalAnimation++;
 		Portal = 0;
