@@ -46,7 +46,12 @@ player::player() :
 	shotSound(0),
 	enemyDamageSound(0),
 	bombSound(),
-	playerHandle()
+	playerHandle(),
+	InputX(),
+	InputY(),
+	CrosshairX(),
+	CrosshairY(),
+	CrosshairHandle()
 {
 }
 
@@ -90,6 +95,8 @@ void player::init()
 	m_sPosY = m_posY;
 	m_sPosR = 8;
 	
+	CrosshairHandle = LoadGraph("Data/Crosshair.png");
+
 	for (int i = 0; i < 8; i++)
 	{
 		m_bPosX[i] = m_posX;
@@ -111,48 +118,91 @@ void player::init()
 void player::update()
 {
 	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+	
+	// アナログスティック
+	GetJoypadAnalogInput(&InputX, &InputY, DX_INPUT_KEY_PAD1);
 
 	if (moveFlag == true)
 	{
-		if (padState & PAD_INPUT_UP)//上
+		//上
+		if (InputX >= -150 && InputX <= 150 && InputY <= -550 || InputX == 0 && InputY <= -400)
 		{
 			m_dir = 0;
 			prev = m_dir;
+
+			CrosshairX = m_posX;
+			CrosshairY = m_posY - 60;
+
 		}
-		if (padState & PAD_INPUT_DOWN)//下
+		//下
+		if (InputX >= -150 && InputX <= 150 && InputY >= 550 || InputX == 0 && InputY >= 400)
 		{
 			m_dir = 1;
 			prev = m_dir;
+
+			CrosshairX = m_posX;
+			CrosshairY = m_posY + 60;
+
 		}
-		if (padState & PAD_INPUT_LEFT)//左
+		//左
+		if (InputY >= -850 && InputY <= 850 && InputX <= -550 || InputY == 0 && InputX <= -400)
 		{
 			m_dir = 2;
 			prev = m_dir;
+
+			CrosshairX = m_posX - 60;
+			CrosshairY = m_posY;
+
 		}
-		if (padState & PAD_INPUT_RIGHT)//右
+		//右
+		if (InputY >= -850 && InputY <= 850 && InputX >= 550 || InputY == 0 && InputX >= 400)
 		{
 			m_dir = 3;
 			prev = m_dir;
+
+			CrosshairX = m_posX + 60;
+			CrosshairY = m_posY;
+
 		}
-		if (padState & PAD_INPUT_UP && padState & PAD_INPUT_RIGHT)//右上
+		//右上
+		if (InputX >= 150 && InputX <= 850 && InputY <= 0 && InputY)
 		{
 			m_dir = 4;
 			prev = m_dir;
+
+			CrosshairX = m_posX + 60;
+			CrosshairY = m_posY - 60;
+
 		}
-		if (padState & PAD_INPUT_RIGHT && padState & PAD_INPUT_DOWN)//右下
+		//右下
+		if (InputX >= 150 && InputX <= 850 && InputY >= 0 && InputY)
 		{
 			m_dir = 5;
 			prev = m_dir;
+
+			CrosshairX = m_posX + 60;
+			CrosshairY = m_posY + 60;
+
 		}
-		if (padState & PAD_INPUT_DOWN && padState & PAD_INPUT_LEFT)//左下
+		//左下
+		if (InputX <= -150 && InputX >= -850 && InputY >= 0 && InputY)
 		{
 			m_dir = 6;
 			prev = m_dir;
+
+			CrosshairX = m_posX - 60;
+			CrosshairY = m_posY + 60;
+
 		}
-		if (padState & PAD_INPUT_LEFT && padState & PAD_INPUT_UP)//左上
+		//左上
+		if (InputX <= -150 && InputX >= -850 && InputY <= 0 && InputY)
 		{
 			m_dir = 7;
 			prev = m_dir;
+
+			CrosshairX = m_posX - 60;
+			CrosshairY = m_posY - 60;
+
 		}
 	}
 
@@ -167,23 +217,33 @@ void player::update()
 void player::shot(enemy& Enemy)
 {
 	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+	static int push = 0;
 
 	//1ボタンでショット
 	if (padState & PAD_INPUT_1)
 	{
-		if (shotFlag == false)
+		if (push == 0)
 		{
-			PlaySoundMem(shotSound, DX_PLAYTYPE_BACK, true);
-			shotFlag = true;
-			moveFlag = false;
+			if (shotFlag == false)
+			{
+				PlaySoundMem(shotSound, DX_PLAYTYPE_BACK, true);
+				shotFlag = true;
+				moveFlag = false;
+			}
 		}
+		push = 1;		
 	}
+	else
+	{
+		push = 0;
+	}
+
 	if (shotFlag == true)
 	{
 		if (prev == 0)
 		{
 			m_sPosY -= 16;
-
+				
 			PI = 4.7;
 		}
 		else if (prev == 1)
@@ -222,12 +282,14 @@ void player::shot(enemy& Enemy)
 		{
 			m_sPosX -= 16;
 			m_sPosY += 13.091;
+
 			PI = 2.3;
 		}
 		else if (prev == 7)
 		{
 			m_sPosX -= 16;
 			m_sPosY -= 13.091;
+
 			PI = 3.7;
 		}
 	}
@@ -514,7 +576,7 @@ void player::draw(torch &Torch)
 		damageEffect = false;
 	}
 
-
+	DrawRotaGraph(CrosshairX, CrosshairY, 1.0, 0, CrosshairHandle, true, false);
 }
 
 

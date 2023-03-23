@@ -13,7 +13,8 @@ torch::torch() :
 	torchCount(4),
 	m_torchHandle(),
 	Torch(0),
-	torchAnimation(0)
+	torchAnimation(0),
+	breakSound()
 {
 }
 

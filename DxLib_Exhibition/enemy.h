@@ -49,8 +49,6 @@ private:
 	int m_skeletonDeathHandle[4];
 	int m_mushDeathHandle[4];
 
-	
-
 	int batAnimation;
 	int Bat;
 

@@ -140,6 +140,7 @@ SceneBase* SceneMain::update()
 			if (m_pTorch->R <= 0 && m_pTorch->G <= 0 && m_pTorch->B <= 0)
 			{
 				StopMusic();
+				gameoverEffect = false;
 				return (new SceneGameover);
 			}
 		}

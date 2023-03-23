@@ -20,9 +20,9 @@ public:
 	int torchCount;
 
 private:
-	int m_tPosX[TORCH];
-	int m_tPosY[TORCH];
-	int m_tPosR[TORCH];
+	float m_tPosX[TORCH];
+	float m_tPosY[TORCH];
+	float m_tPosR[TORCH];
 
 	int m_torchHandle[7];
 	int Torch;

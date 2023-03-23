@@ -91,4 +91,12 @@ private:
 	int shotSound;
 	int enemyDamageSound;
 	int bombSound;
+
+	int InputX;
+	int InputY;
+
+	int CrosshairX;
+	int CrosshairY;
+
+	int CrosshairHandle;
 };

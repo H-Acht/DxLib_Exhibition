@@ -57,7 +57,7 @@ private:
 	int a[3];
 
 	bool bombFlag;
-	float m_bPosX[8];
-	float m_bPosY[8];
-	float bPI[8];
+	double m_bPosX[8];
+	double m_bPosY[8];
+	double bPI[8];
 };
