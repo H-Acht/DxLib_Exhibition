@@ -25,13 +25,22 @@ enemy::enemy() :
 	m_skeletonHandle(),
 	m_skeletonDeathHandle(),
 	m_batHandle(),
+	m_batDeathHandle(),
 	m_mushHandle(),
 	m_mushDeathHandle(),
 	m_eyeHandle(),
 	m_eyeDeathHandle(),
 	dFlag(),
 	deathPosX(),
-	deathPosY()
+	deathPosY(),
+	bDeathAnimation(0),
+	bDeath(0),
+	Portal(0),
+	portalAnimation(0),
+	damageSound(),
+	kindFlag(),
+	portal1(),
+	portal2()
 {
 }
 
@@ -39,16 +48,25 @@ enemy::~enemy()
 {
 	for (int i = 0; i < 8; i++)
 	{
-		DeleteGraph(m_batHandle[i]);
 		DeleteGraph(m_mushHandle[i]);
 		DeleteGraph(m_eyeHandle[i]);
 	}
 	for (int i = 0; i < 4; i++)
 	{
+		DeleteGraph(m_batHandle[i]);
 		DeleteGraph(m_skeletonHandle[i]);
 		DeleteGraph(m_skeletonDeathHandle[i]);
 		DeleteGraph(m_mushDeathHandle[i]);
 		DeleteGraph(m_eyeDeathHandle[i]);
+	}
+	for (int i = 0; i < 5; i++)
+	{
+		DeleteGraph(m_batDeathHandle[i]);
+	}
+	for (int i = 0; i < 15; i++)
+	{
+		DeleteGraph(portal1[i]);
+		DeleteGraph(portal2[i]);
 	}
 }
 
@@ -62,7 +80,8 @@ void enemy::init(player &Player)
 
 	deadCount = 0;
 
-	LoadDivGraph("Data/Bat_spritesheet.png", 8, 3, 3, 256, 256, m_batHandle);
+	LoadDivGraph("Data/WhiteBatFlight.png", 4, 4, 1, 128, 128, m_batHandle);
+	LoadDivGraph("Data/WhitebatDeath.png", 5, 5, 1, 128, 128, m_batDeathHandle);
 	LoadDivGraph("Data/EyeFlight.png", 8, 8, 1, 150, 150, m_eyeHandle);
 	LoadDivGraph("Data/EyeDeath.png", 4, 4, 1, 150, 150, m_eyeDeathHandle);
 	LoadDivGraph("Data/SkeletonWalk.png", 4, 4, 1, 150, 150, m_skeletonHandle);
@@ -70,34 +89,39 @@ void enemy::init(player &Player)
 	LoadDivGraph("Data/MushRun.png", 8, 8, 1, 150, 150, m_mushHandle);
 	LoadDivGraph("Data/MushDeath.png", 4, 4, 1, 150, 150, m_mushDeathHandle);
 
+	LoadDivGraph("Data/portal1.png", 15, 5, 3, 192, 192, portal1);
+	LoadDivGraph("Data/portal2.png", 15, 5, 3, 192, 192, portal2);
+
+
+	damageSound = LoadSoundMem("Data/Sound/damage.mp3");
 
 #if true
 
 	for (int i = 0; i < 3; i++)
 	{
 		m_ePosX[0][i] = (Game::kScreenWidth + 500) / 2;
-		m_ePosY[0][i] = 20.0f;
+		m_ePosY[0][i] = -20.0f;
 
 		m_ePosX[1][i] = (Game::kScreenWidth + 500) / 2;
-		m_ePosY[1][i] = Game::kScreenHeight - 20;
+		m_ePosY[1][i] = Game::kScreenHeight + 20;
 
-		m_ePosX[2][i] = 520.0f;
+		m_ePosX[2][i] = 480.0f;
 		m_ePosY[2][i] = Game::kScreenHeight / 2; 
 	
-		m_ePosX[3][i] = Game::kScreenWidth - 20;
+		m_ePosX[3][i] = Game::kScreenWidth + 20;
 		m_ePosY[3][i] = Game::kScreenHeight / 2;
 
-		m_ePosX[4][i] = Game::kScreenWidth - 20;
-		m_ePosY[4][i] = 20.0f;
+		m_ePosX[4][i] = Game::kScreenWidth + 20;
+		m_ePosY[4][i] = -20.0f;
 
-		m_ePosX[5][i] = Game::kScreenWidth - 20;
-		m_ePosY[5][i] = Game::kScreenHeight - 20;
+		m_ePosX[5][i] = Game::kScreenWidth + 20;
+		m_ePosY[5][i] = Game::kScreenHeight + 20;
 
-		m_ePosX[6][i] = 520.0f;
-		m_ePosY[6][i] = Game::kScreenHeight - 20;
+		m_ePosX[6][i] = 480.0f;
+		m_ePosY[6][i] = Game::kScreenHeight + 20;
 
-		m_ePosX[7][i] = 520.0f;
-		m_ePosY[7][i] = 20.0f;
+		m_ePosX[7][i] = 480.0f;
+		m_ePosY[7][i] = -20.0f;
 	}
 
 #endif
@@ -147,7 +171,7 @@ void enemy::update1(player &Player)
 		{
 			//位置をリセット
 			m_ePosX[0][0] = static_cast<float>((Game::kScreenWidth + 500)) / 2;
-			m_ePosY[0][0] = 20.0f;
+			m_ePosY[0][0] = -20.0f;
 
 			moveFlag[0] = true;
 			deadFlag[0][0] = false;
@@ -163,7 +187,7 @@ void enemy::update1(player &Player)
 		if (deadFlag[2][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[2][0] = 520.0f;
+			m_ePosX[2][0] = 480.0f;
 			m_ePosY[2][0] = static_cast<float>(Game::kScreenHeight) / 2;
 
 			moveFlag[0] = true;
@@ -180,7 +204,7 @@ void enemy::update1(player &Player)
 		if (deadFlag[3][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[3][0] = Game::kScreenWidth - 20;
+			m_ePosX[3][0] = Game::kScreenWidth + 20;
 			m_ePosY[3][0] = static_cast<float>(Game::kScreenHeight) / 2;
 
 			moveFlag[0] = true;
@@ -198,8 +222,8 @@ void enemy::update1(player &Player)
 		if (deadFlag[4][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[4][0] = Game::kScreenWidth - 20;
-			m_ePosY[4][0] = 20;
+			m_ePosX[4][0] = Game::kScreenWidth + 20;
+			m_ePosY[4][0] = -20;
 
 			moveFlag[0] = true;
 			deadFlag[4][0] = false;
@@ -216,8 +240,8 @@ void enemy::update1(player &Player)
 		if (deadFlag[7][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[7][0] = 520.0f;
-			m_ePosY[7][0] = 20.0f;
+			m_ePosX[7][0] = 480.0f;
+			m_ePosY[7][0] = -20.0f;
 
 			moveFlag[0] = true;
 			deadFlag[7][0] = false;
@@ -234,6 +258,7 @@ void enemy::update1(player &Player)
 	float dl = ar * ar;
 	if (dr < dl)
 	{
+		PlaySoundMem(damageSound, DX_PLAYTYPE_BACK, true);
 		deadFlag[eDirection[0]][0] = true;// ここでプレイヤーにぶつかった際に撃破数が増える、要修正
 		deadCount--;// ↑の仮修正
 		Player.damageFlag = true;
@@ -260,7 +285,7 @@ void enemy::update2(player& Player)
 		{
 			//位置をリセット
 			m_ePosX[0][0] = static_cast<float>((Game::kScreenWidth + 500)) / 2;
-			m_ePosY[0][0] = 20.0f;
+			m_ePosY[0][0] = -20.0f;
 
 			moveFlag[0] = true;
 			deadFlag[0][0] = false;
@@ -277,7 +302,7 @@ void enemy::update2(player& Player)
 		{
 			//位置をリセット
 			m_ePosX[1][0] = static_cast<float>((Game::kScreenWidth + 500)) / 2;
-			m_ePosY[1][0] = Game::kScreenHeight - 20;
+			m_ePosY[1][0] = Game::kScreenHeight + 20;
 
 			moveFlag[0] = true;
 			deadFlag[0][0] = false;
@@ -293,7 +318,7 @@ void enemy::update2(player& Player)
 		if (deadFlag[2][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[2][0] = 520.0f;
+			m_ePosX[2][0] = 480.0f;
 			m_ePosY[2][0] = static_cast<float>(Game::kScreenHeight) / 2;
 
 			moveFlag[0] = true;
@@ -310,7 +335,7 @@ void enemy::update2(player& Player)
 		if (deadFlag[3][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[3][0] = Game::kScreenWidth - 20;
+			m_ePosX[3][0] = Game::kScreenWidth + 20;
 			m_ePosY[3][0] = static_cast<float>(Game::kScreenHeight) / 2;
 
 			moveFlag[0] = true;
@@ -328,8 +353,8 @@ void enemy::update2(player& Player)
 		if (deadFlag[4][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[4][0] = Game::kScreenWidth - 20;
-			m_ePosY[4][0] = 20;
+			m_ePosX[4][0] = Game::kScreenWidth + 20;
+			m_ePosY[4][0] = -20;
 
 			moveFlag[0] = true;
 			deadFlag[4][0] = false;
@@ -346,8 +371,8 @@ void enemy::update2(player& Player)
 		if (deadFlag[5][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[5][0] = Game::kScreenWidth - 20;
-			m_ePosY[5][0] = Game::kScreenHeight - 20;
+			m_ePosX[5][0] = Game::kScreenWidth + 20;
+			m_ePosY[5][0] = Game::kScreenHeight + 20;
 
 			moveFlag[0] = true;
 			deadFlag[5][0] = false;
@@ -364,8 +389,8 @@ void enemy::update2(player& Player)
 		if (deadFlag[6][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[6][0] = 520.0f;
-			m_ePosY[6][0] = Game::kScreenHeight - 20;
+			m_ePosX[6][0] = 480.0f;
+			m_ePosY[6][0] = Game::kScreenHeight + 20;
 
 			moveFlag[0] = true;
 			deadFlag[6][0] = false;
@@ -382,8 +407,8 @@ void enemy::update2(player& Player)
 		if (deadFlag[7][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[7][0] = 520.0f;
-			m_ePosY[7][0] = 20.0f;
+			m_ePosX[7][0] = 480.0f;
+			m_ePosY[7][0] = -20.0f;
 
 			moveFlag[0] = true;
 			deadFlag[7][0] = false;
@@ -400,6 +425,8 @@ void enemy::update2(player& Player)
 	float dl = ar * ar;
 	if (dr < dl)
 	{
+		PlaySoundMem(damageSound, DX_PLAYTYPE_BACK, true);
+
 		deadFlag[eDirection[0]][0] = true;// ここでプレイヤーにぶつかった際に撃破数が増える、要修正
 		deadCount--;// ↑の仮修正
 		Player.damageFlag = true;
@@ -409,12 +436,14 @@ void enemy::update2(player& Player)
 
 void enemy::update3(player& Player)
 {
-	if (moveFlag[0] == true)
+	for (int i = 0; i < 8; i++)
 	{
-		eDirection[0] = GetRand(8 - 1);
-		enemyKinds[0] = GetRand(2 - 1);
+		if (moveFlag[0] == true && dFlag[i][0] == false)
+		{
+			eDirection[0] = GetRand(8 - 1);
+			enemyKinds[0] = GetRand(2 - 1);
+		}
 	}
-
 	m_ePosX[eDirection[0]];
 	m_ePosY[eDirection[0]];
 
@@ -434,7 +463,7 @@ void enemy::update3(player& Player)
 		if (deadFlag[0][0] == true)
 		{
 			//位置をリセット
-			m_ePosY[0][0] = 20;
+			m_ePosY[0][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[0][0] = false;
 			deadCount++;
@@ -457,7 +486,7 @@ void enemy::update3(player& Player)
 		if (deadFlag[1][0] == true)
 		{
 			//位置をリセット
-			m_ePosY[1][0] = Game::kScreenHeight - 20;
+			m_ePosY[1][0] = Game::kScreenHeight + 20;
 
 			moveFlag[0] = true;
 			deadFlag[1][0] = false;
@@ -480,7 +509,7 @@ void enemy::update3(player& Player)
 		if (deadFlag[2][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[2][0] = 520.0f;
+			m_ePosX[2][0] = 480.0f;
 			moveFlag[0] = true;
 			deadFlag[2][0] = false;
 			deadCount++;
@@ -503,7 +532,8 @@ void enemy::update3(player& Player)
 		if (deadFlag[3][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[3][0] = Game::kScreenWidth - 20;
+			m_ePosX[3][0] = Game::kScreenWidth + 20;
+
 			moveFlag[0] = true;
 			deadFlag[3][0] = false;
 			deadCount++;
@@ -526,8 +556,8 @@ void enemy::update3(player& Player)
 		if (deadFlag[4][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[4][0] = Game::kScreenWidth - 20;
-			m_ePosY[4][0] = 20;
+			m_ePosX[4][0] = Game::kScreenWidth + 20;
+			m_ePosY[4][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[4][0] = false;
 			deadCount++;
@@ -550,8 +580,8 @@ void enemy::update3(player& Player)
 		if (deadFlag[5][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[5][0] = Game::kScreenWidth - 20;
-			m_ePosY[5][0] = Game::kScreenHeight - 20;
+			m_ePosX[5][0] = Game::kScreenWidth + 20;
+			m_ePosY[5][0] = Game::kScreenHeight + 20;
 			moveFlag[0] = true;
 			deadFlag[5][0] = false;
 			deadCount++;
@@ -574,8 +604,8 @@ void enemy::update3(player& Player)
 		if (deadFlag[6][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[6][0] = 520.0f;
-			m_ePosY[6][0] = Game::kScreenHeight - 20;
+			m_ePosX[6][0] = 480.0f;
+			m_ePosY[6][0] = Game::kScreenHeight + 20;
 			moveFlag[0] = true;
 			deadFlag[6][0] = false;
 			deadCount++;
@@ -598,8 +628,8 @@ void enemy::update3(player& Player)
 		if (deadFlag[7][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[7][0] = 520.0f;
-			m_ePosY[7][0] = 20;
+			m_ePosX[7][0] = 480.0f;
+			m_ePosY[7][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[7][0] = false;
 			deadCount++;
@@ -616,6 +646,8 @@ void enemy::update3(player& Player)
 	float dl = ar * ar;
 	if (dr < dl)
 	{
+		PlaySoundMem(damageSound, DX_PLAYTYPE_BACK, true);
+
 		deadFlag[eDirection[0]][0] = true;
 		deadCount--;
 		Player.damageFlag = true;
@@ -624,10 +656,13 @@ void enemy::update3(player& Player)
 
 void enemy::update4(player& Player)
 {
-	if (moveFlag[0] == true)
+	for (int i = 0; i < 8; i++)
 	{
-		eDirection[0] = GetRand(8 - 1);
-		enemyKinds[0] = GetRand(2 - 1);
+		if (moveFlag[0] == true && dFlag[i][0] == false)
+		{
+			eDirection[0] = GetRand(8 - 1);
+			enemyKinds[0] = GetRand(2 - 1);
+		}
 	}
 
 	m_ePosX[eDirection[0]];
@@ -649,7 +684,8 @@ void enemy::update4(player& Player)
 		if (deadFlag[0][0] == true)
 		{
 			//位置をリセット
-			m_ePosY[0][0] = 20;
+			m_ePosY[0][0] = -20;
+
 			moveFlag[0] = true;
 			deadFlag[0][0] = false;
 			deadCount++;
@@ -672,7 +708,7 @@ void enemy::update4(player& Player)
 		if (deadFlag[1][0] == true)
 		{
 			//位置をリセット
-			m_ePosY[1][0] = Game::kScreenHeight - 20;
+			m_ePosY[1][0] = Game::kScreenHeight + 20;
 
 			moveFlag[0] = true;
 			deadFlag[1][0] = false;
@@ -695,7 +731,7 @@ void enemy::update4(player& Player)
 		if (deadFlag[2][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[2][0] = 520.0f;
+			m_ePosX[2][0] = 480.0f;
 			moveFlag[0] = true;
 			deadFlag[2][0] = false;
 			deadCount++;
@@ -718,7 +754,7 @@ void enemy::update4(player& Player)
 		if (deadFlag[3][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[3][0] = Game::kScreenWidth - 20;
+			m_ePosX[3][0] = Game::kScreenWidth + 20;
 			moveFlag[0] = true;
 			deadFlag[3][0] = false;
 			deadCount++;
@@ -742,8 +778,8 @@ void enemy::update4(player& Player)
 		if (deadFlag[4][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[4][0] = Game::kScreenWidth - 20;
-			m_ePosY[4][0] = 20;
+			m_ePosX[4][0] = Game::kScreenWidth + 20;
+			m_ePosY[4][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[4][0] = false;
 			deadCount++;
@@ -767,8 +803,8 @@ void enemy::update4(player& Player)
 		if (deadFlag[5][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[5][0] = Game::kScreenWidth - 20;
-			m_ePosY[5][0] = Game::kScreenHeight - 20;
+			m_ePosX[5][0] = Game::kScreenWidth + 20;
+			m_ePosY[5][0] = Game::kScreenHeight + 20;
 			moveFlag[0] = true;
 			deadFlag[5][0] = false;
 			deadCount++;
@@ -792,8 +828,8 @@ void enemy::update4(player& Player)
 		if (deadFlag[6][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[6][0] = 520.0f;
-			m_ePosY[6][0] = Game::kScreenHeight - 20;
+			m_ePosX[6][0] = 480.0f;
+			m_ePosY[6][0] = Game::kScreenHeight + 20;
 			moveFlag[0] = true;
 			deadFlag[6][0] = false;
 			deadCount++;
@@ -817,8 +853,8 @@ void enemy::update4(player& Player)
 		if (deadFlag[7][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[7][0] = 520.0f;
-			m_ePosY[7][0] = 20;
+			m_ePosX[7][0] = 480.0f;
+			m_ePosY[7][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[7][0] = false;
 			deadCount++;
@@ -835,6 +871,8 @@ void enemy::update4(player& Player)
 	float dl = ar * ar;
 	if (dr < dl)
 	{
+		PlaySoundMem(damageSound, DX_PLAYTYPE_BACK, true);
+
 		deadFlag[eDirection[0]][0] = true;
 		deadCount--;
 		Player.damageFlag = true;
@@ -843,10 +881,13 @@ void enemy::update4(player& Player)
 
 void enemy::update5(player& Player)
 {
-	if (moveFlag[0] == true)
+	for (int i = 0; i < 8; i++)
 	{
-		eDirection[0] = GetRand(8 - 1);
-		enemyKinds[0] = GetRand(2 - 1);
+		if (moveFlag[0] == true && dFlag[i][0] == false)
+		{
+			eDirection[0] = GetRand(8 - 1);
+			enemyKinds[0] = GetRand(2 - 1);
+		}
 	}
 
 	m_ePosX[eDirection[0]][0];
@@ -868,7 +909,7 @@ void enemy::update5(player& Player)
 		if (deadFlag[0][0] == true)
 		{
 			//位置をリセット
-			m_ePosY[0][0] = 20;
+			m_ePosY[0][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[0][0] = false;
 			deadCount++;
@@ -891,7 +932,7 @@ void enemy::update5(player& Player)
 		if (deadFlag[1][0] == true)
 		{
 			//位置をリセット
-			m_ePosY[1][0] = Game::kScreenHeight - 20;
+			m_ePosY[1][0] = Game::kScreenHeight + 20;
 
 			moveFlag[0] = true;
 			deadFlag[1][0] = false;
@@ -914,7 +955,7 @@ void enemy::update5(player& Player)
 		if (deadFlag[2][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[2][0] = 520.0f;
+			m_ePosX[2][0] = 480.0f;
 			moveFlag[0] = true;
 			deadFlag[2][0] = false;
 			deadCount++;
@@ -937,7 +978,7 @@ void enemy::update5(player& Player)
 		if (deadFlag[3][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[3][0] = Game::kScreenWidth - 20;
+			m_ePosX[3][0] = Game::kScreenWidth + 20;
 			moveFlag[0] = true;
 			deadFlag[3][0] = false;
 			deadCount++;
@@ -962,8 +1003,8 @@ void enemy::update5(player& Player)
 		if (deadFlag[4][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[4][0] = Game::kScreenWidth - 20;
-			m_ePosY[4][0] = 20;
+			m_ePosX[4][0] = Game::kScreenWidth + 20;
+			m_ePosY[4][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[4][0] = false;
 			deadCount++;
@@ -987,8 +1028,8 @@ void enemy::update5(player& Player)
 		if (deadFlag[5][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[5][0] = Game::kScreenWidth - 20;
-			m_ePosY[5][0] = Game::kScreenHeight - 20;
+			m_ePosX[5][0] = Game::kScreenWidth + 20;
+			m_ePosY[5][0] = Game::kScreenHeight + 20;
 			moveFlag[0] = true;
 			deadFlag[5][0] = false;
 			deadCount++;
@@ -1012,8 +1053,8 @@ void enemy::update5(player& Player)
 		if (deadFlag[6][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[6][0] = 520.0f;
-			m_ePosY[6][0] = Game::kScreenHeight - 20;
+			m_ePosX[6][0] = 480.0f;
+			m_ePosY[6][0] = Game::kScreenHeight + 20;
 			moveFlag[0] = true;
 			deadFlag[6][0] = false;
 			deadCount++;
@@ -1037,8 +1078,8 @@ void enemy::update5(player& Player)
 		if (deadFlag[7][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[7][0] = 520.0f;
-			m_ePosY[7][0] = 20;
+			m_ePosX[7][0] = 480.0f;
+			m_ePosY[7][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[7][0] = false;
 			deadCount++;
@@ -1046,13 +1087,14 @@ void enemy::update5(player& Player)
 	}
 
 	//////////////////敵2//////////////////
-
-	if (moveFlag[1] == true)
+	for (int i = 0; i < 8; i++)
 	{
-		eDirection[1] = GetRand(8 - 1);
-		enemyKinds[1] = GetRand(2 - 1);
+		if (moveFlag[1] == true && dFlag[i][1] == false)
+		{
+			eDirection[1] = GetRand(8 - 1);
+			enemyKinds[1] = GetRand(2 - 1);
+		}
 	}
-
 	m_ePosX[eDirection[1]][1];
 	m_ePosY[eDirection[1]][1];
 
@@ -1072,7 +1114,7 @@ void enemy::update5(player& Player)
 		if (deadFlag[0][1] == true)
 		{
 			//位置をリセット
-			m_ePosY[0][1] = 20;
+			m_ePosY[0][1] = -20;
 			moveFlag[1] = true;
 			deadFlag[0][1] = false;
 			deadCount++;
@@ -1095,7 +1137,7 @@ void enemy::update5(player& Player)
 		if (deadFlag[1][1] == true)
 		{
 			//位置をリセット
-			m_ePosY[1][1] = Game::kScreenHeight - 20;
+			m_ePosY[1][1] = Game::kScreenHeight + 20;
 
 			moveFlag[1] = true;
 			deadFlag[1][1] = false;
@@ -1118,7 +1160,7 @@ void enemy::update5(player& Player)
 		if (deadFlag[2][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[2][1] = 520.0f;
+			m_ePosX[2][1] = 480.0f;
 			moveFlag[1] = true;
 			deadFlag[2][1] = false;
 			deadCount++;
@@ -1141,7 +1183,7 @@ void enemy::update5(player& Player)
 		if (deadFlag[3][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[3][1] = Game::kScreenWidth - 20;
+			m_ePosX[3][1] = Game::kScreenWidth + 20;
 			moveFlag[1] = true;
 			deadFlag[3][1] = false;
 			deadCount++;
@@ -1166,8 +1208,8 @@ void enemy::update5(player& Player)
 		if (deadFlag[4][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[4][1] = Game::kScreenWidth - 20;
-			m_ePosY[4][1] = 20;
+			m_ePosX[4][1] = Game::kScreenWidth + 20;
+			m_ePosY[4][1] = -20;
 			moveFlag[1] = true;
 			deadFlag[4][1] = false;
 			deadCount++;
@@ -1191,8 +1233,8 @@ void enemy::update5(player& Player)
 		if (deadFlag[5][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[5][1] = Game::kScreenWidth - 20;
-			m_ePosY[5][1] = Game::kScreenHeight - 20;
+			m_ePosX[5][1] = Game::kScreenWidth + 20;
+			m_ePosY[5][1] = Game::kScreenHeight + 20;
 			moveFlag[1] = true;
 			deadFlag[5][1] = false;
 			deadCount++;
@@ -1216,8 +1258,8 @@ void enemy::update5(player& Player)
 		if (deadFlag[6][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[6][1] = 520.0f;
-			m_ePosY[6][1] = Game::kScreenHeight - 20;
+			m_ePosX[6][1] = 480.0f;
+			m_ePosY[6][1] = Game::kScreenHeight + 20;
 			moveFlag[1] = true;
 			deadFlag[6][1] = false;
 			deadCount++;
@@ -1241,8 +1283,8 @@ void enemy::update5(player& Player)
 		if (deadFlag[7][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[7][1] = 520.0f;
-			m_ePosY[7][1] = 20;
+			m_ePosX[7][1] = 480.0f;
+			m_ePosY[7][1] = -20;
 			moveFlag[1] = true;
 			deadFlag[7][1] = false;
 			deadCount++;
@@ -1260,6 +1302,8 @@ void enemy::update5(player& Player)
 		float dl = ar * ar;
 		if (dr < dl)
 		{
+			PlaySoundMem(damageSound, DX_PLAYTYPE_BACK, true);
+
 			deadFlag[eDirection[i]][i] = true;
 			deadCount--;
 			Player.damageFlag = true;
@@ -1269,10 +1313,13 @@ void enemy::update5(player& Player)
 
 void enemy::update6(player& Player)
 {
-	if (moveFlag[0] == true)
+	for (int i = 0; i < 8; i++)
 	{
-		eDirection[0] = GetRand(8 - 1);
-		enemyKinds[0] = GetRand(2 - 1);
+		if (moveFlag[0] == true && dFlag[i][0] == false)
+		{
+			eDirection[0] = GetRand(8 - 1);
+			enemyKinds[0] = GetRand(2 - 1);
+		}
 	}
 
 	m_ePosX[eDirection[0]][0];
@@ -1294,7 +1341,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[0][0] == true)
 		{
 			//位置をリセット
-			m_ePosY[0][0] = 20;
+			m_ePosY[0][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[0][0] = false;
 			deadCount++;
@@ -1317,7 +1364,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[1][0] == true)
 		{
 			//位置をリセット
-			m_ePosY[1][0] = Game::kScreenHeight - 20;
+			m_ePosY[1][0] = Game::kScreenHeight + 20;
 
 			moveFlag[0] = true;
 			deadFlag[1][0] = false;
@@ -1340,7 +1387,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[2][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[2][0] = 520.0f;
+			m_ePosX[2][0] = 480.0f;
 			moveFlag[0] = true;
 			deadFlag[2][0] = false;
 			deadCount++;
@@ -1363,7 +1410,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[3][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[3][0] = Game::kScreenWidth - 20;
+			m_ePosX[3][0] = Game::kScreenWidth + 20;
 			moveFlag[0] = true;
 			deadFlag[3][0] = false;
 			deadCount++;
@@ -1388,8 +1435,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[4][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[4][0] = Game::kScreenWidth - 20;
-			m_ePosY[4][0] = 20;
+			m_ePosX[4][0] = Game::kScreenWidth + 20;
+			m_ePosY[4][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[4][0] = false;
 			deadCount++;
@@ -1413,8 +1460,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[5][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[5][0] = Game::kScreenWidth - 20;
-			m_ePosY[5][0] = Game::kScreenHeight - 20;
+			m_ePosX[5][0] = Game::kScreenWidth + 20;
+			m_ePosY[5][0] = Game::kScreenHeight + 20;
 			moveFlag[0] = true;
 			deadFlag[5][0] = false;
 			deadCount++;
@@ -1438,8 +1485,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[6][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[6][0] = 520.0f;
-			m_ePosY[6][0] = Game::kScreenHeight - 20;
+			m_ePosX[6][0] = 480.0f;
+			m_ePosY[6][0] = Game::kScreenHeight + 20;
 			moveFlag[0] = true;
 			deadFlag[6][0] = false;
 			deadCount++;
@@ -1463,8 +1510,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[7][0] == true)
 		{
 			//位置をリセット
-			m_ePosX[7][0] = 520.0f;
-			m_ePosY[7][0] = 20;
+			m_ePosX[7][0] = 480.0f;
+			m_ePosY[7][0] = -20;
 			moveFlag[0] = true;
 			deadFlag[7][0] = false;
 			deadCount++;
@@ -1472,11 +1519,13 @@ void enemy::update6(player& Player)
 	}
 
 	//////////////////敵2//////////////////
-
-	if (moveFlag[1] == true)
+	for (int i = 0; i < 8; i++)
 	{
-		eDirection[1] = GetRand(8 - 1);
-		enemyKinds[1] = GetRand(2 - 1);
+		if (moveFlag[1] == true && dFlag[i][1] == false)
+		{
+			eDirection[1] = GetRand(8 - 1);
+			enemyKinds[1] = GetRand(2 - 1);
+		}
 	}
 
 	m_ePosX[eDirection[1]][1];
@@ -1498,7 +1547,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[0][1] == true)
 		{
 			//位置をリセット
-			m_ePosY[0][1] = 20;
+			m_ePosY[0][1] = -20;
 			moveFlag[1] = true;
 			deadFlag[0][1] = false;
 			deadCount++;
@@ -1521,7 +1570,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[1][1] == true)
 		{
 			//位置をリセット
-			m_ePosY[1][1] = Game::kScreenHeight - 20;
+			m_ePosY[1][1] = Game::kScreenHeight + 20;
 
 			moveFlag[1] = true;
 			deadFlag[1][1] = false;
@@ -1544,7 +1593,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[2][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[2][1] = 520.0f;
+			m_ePosX[2][1] = 480.0f;
 			moveFlag[1] = true;
 			deadFlag[2][1] = false;
 			deadCount++;
@@ -1567,7 +1616,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[3][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[3][1] = Game::kScreenWidth - 20;
+			m_ePosX[3][1] = Game::kScreenWidth + 20;
 			moveFlag[1] = true;
 			deadFlag[3][1] = false;
 			deadCount++;
@@ -1592,8 +1641,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[4][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[4][1] = Game::kScreenWidth - 20;
-			m_ePosY[4][1] = 20;
+			m_ePosX[4][1] = Game::kScreenWidth + 20;
+			m_ePosY[4][1] = -20;
 			moveFlag[1] = true;
 			deadFlag[4][1] = false;
 			deadCount++;
@@ -1617,8 +1666,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[5][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[5][1] = Game::kScreenWidth - 20;
-			m_ePosY[5][1] = Game::kScreenHeight - 20;
+			m_ePosX[5][1] = Game::kScreenWidth + 20;
+			m_ePosY[5][1] = Game::kScreenHeight + 20;
 			moveFlag[1] = true;
 			deadFlag[5][1] = false;
 			deadCount++;
@@ -1642,8 +1691,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[6][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[6][1] = 520.0f;
-			m_ePosY[6][1] = Game::kScreenHeight - 20;
+			m_ePosX[6][1] = 480.0f;
+			m_ePosY[6][1] = Game::kScreenHeight + 20;
 			moveFlag[1] = true;
 			deadFlag[6][1] = false;
 			deadCount++;
@@ -1667,8 +1716,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[7][1] == true)
 		{
 			//位置をリセット
-			m_ePosX[7][1] = 520.0f;
-			m_ePosY[7][1] = 20;
+			m_ePosX[7][1] = 480.0f;
+			m_ePosY[7][1] = -20;
 			moveFlag[1] = true;
 			deadFlag[7][1] = false;
 			deadCount++;
@@ -1676,11 +1725,13 @@ void enemy::update6(player& Player)
 	}
 
 	//////////////////敵3//////////////////
-
-	if (moveFlag[2] == true)
+	for (int i = 0; i < 8; i++)
 	{
-		eDirection[2] = GetRand(8 - 1);
-		enemyKinds[2] = GetRand(2 - 1);
+		if (moveFlag[2] == true && dFlag[i][2] == false)
+		{
+			eDirection[2] = GetRand(8 - 1);
+			enemyKinds[2] = GetRand(2 - 1);
+		}
 	}
 
 	m_ePosX[eDirection[2]][2];
@@ -1702,7 +1753,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[0][2] == true)
 		{
 			//位置をリセット
-			m_ePosY[0][2] = 20;
+			m_ePosY[0][2] = -20;
 			moveFlag[2] = true;
 			deadFlag[0][2] = false;
 			deadCount++;
@@ -1725,7 +1776,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[1][2] == true)
 		{
 			//位置をリセット
-			m_ePosY[1][2] = Game::kScreenHeight - 20;
+			m_ePosY[1][2] = Game::kScreenHeight + 20;
 
 			moveFlag[2] = true;
 			deadFlag[1][2] = false;
@@ -1748,7 +1799,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[2][2] == true)
 		{
 			//位置をリセット
-			m_ePosX[2][2] = 520.0f;
+			m_ePosX[2][2] = 480.0f;
 			moveFlag[2] = true;
 			deadFlag[2][2] = false;
 			deadCount++;
@@ -1771,7 +1822,7 @@ void enemy::update6(player& Player)
 		if (deadFlag[3][2] == true)
 		{
 			//位置をリセット
-			m_ePosX[3][2] = Game::kScreenWidth - 20;
+			m_ePosX[3][2] = Game::kScreenWidth + 20;
 			moveFlag[2] = true;
 			deadFlag[3][2] = false;
 			deadCount++;
@@ -1796,8 +1847,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[4][2] == true)
 		{
 			//位置をリセット
-			m_ePosX[4][2] = Game::kScreenWidth - 20;
-			m_ePosY[4][2] = 20;
+			m_ePosX[4][2] = Game::kScreenWidth + 20;
+			m_ePosY[4][2] = -20;
 			moveFlag[2] = true;
 			deadFlag[4][2] = false;
 			deadCount++;
@@ -1821,8 +1872,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[5][2] == true)
 		{
 			//位置をリセット
-			m_ePosX[5][2] = Game::kScreenWidth - 20;
-			m_ePosY[5][2] = Game::kScreenHeight - 20;
+			m_ePosX[5][2] = Game::kScreenWidth + 20;
+			m_ePosY[5][2] = Game::kScreenHeight + 20;
 			moveFlag[2] = true;
 			deadFlag[5][2] = false;
 			deadCount++;
@@ -1846,8 +1897,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[6][2] == true)
 		{
 			//位置をリセット
-			m_ePosX[6][2] = 520.0f;
-			m_ePosY[6][2] = Game::kScreenHeight - 20;
+			m_ePosX[6][2] = 480.0f;
+			m_ePosY[6][2] = Game::kScreenHeight + 20;
 			moveFlag[2] = true;
 			deadFlag[6][2] = false;
 			deadCount++;
@@ -1871,8 +1922,8 @@ void enemy::update6(player& Player)
 		if (deadFlag[7][2] == true)
 		{
 			//位置をリセット
-			m_ePosX[7][2] = 520.0f;
-			m_ePosY[7][2] = 20;
+			m_ePosX[7][2] = 480.0f;
+			m_ePosY[7][2] = -20;
 			moveFlag[2] = true;
 			deadFlag[7][2] = false;
 			deadCount++;
@@ -1890,6 +1941,8 @@ void enemy::update6(player& Player)
 		float dl = ar * ar;
 		if (dr < dl)
 		{
+			PlaySoundMem(damageSound, DX_PLAYTYPE_BACK, true);
+
 			deadFlag[eDirection[i]][i] = true;
 			deadCount--;
 			Player.damageFlag = true;
@@ -1900,47 +1953,58 @@ void enemy::update6(player& Player)
 void enemy::draw()
 {
 	Bat++;
-	if (Bat % 5 == 0)
+	if (Bat % 6 == 0)
 	{
 		batAnimation++;
-		if (batAnimation == 8)
+		Bat = 0;
+		if (batAnimation == 4)
 		{
 			batAnimation = 0;
 		}
-		Bat = 0;
 	}
 
 	Eye++;
 	if (Eye % 3 == 0)
 	{
 		eyeAnimation++;
+		Eye = 0;
 		if (eyeAnimation == 8)
 		{
 			eyeAnimation = 0;
 		}
-		Eye = 0;
 	}
 
 	Skeleton++;
 	if (Skeleton % 10 == 0)
 	{
 		skeletonAnimation++;
+		Skeleton = 0;
 		if (skeletonAnimation == 4)
 		{
 			skeletonAnimation = 0;
 		}
-		Skeleton = 0;
 	}
 
 	Mush++;
 	if (Mush % 5 == 0)
 	{
 		mushAnimation++;
+		Mush = 0;
 		if (mushAnimation == 8)
 		{
 			mushAnimation = 0;
 		}
-		Mush = 0;
+	}
+
+	Portal++;
+	if (Portal % 5 == 0)
+	{
+		portalAnimation++;
+		Portal = 0;
+		if (portalAnimation == 15)
+		{
+			portalAnimation = 0;
+		}
 	}
 
 	for (int i = 0; i < DIR; i++)
@@ -1952,7 +2016,6 @@ void enemy::draw()
 				if (i == 1 || i == 3)
 				{
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.5, 0, m_skeletonHandle[skeletonAnimation], true, true);
-					DrawCircle(m_ePosX[i][j], m_ePosY[i][j], m_ePosR, GetColor(255, 0, 0), false);
 
 					if (dFlag[i][j] == true)
 					{
@@ -1962,20 +2025,18 @@ void enemy::draw()
 						if (Death % 5 == 0)
 						{
 							deathAnimation++;
-
+							Death = 0;
 							if (deathAnimation == 4)
 							{
 								deathAnimation = 0;
 								dFlag[i][j] = false;
 							}
-							Death = 0;
 						}
 					}
 				}
 				if (i == 0 || i == 2)
 				{
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.5, 0, m_skeletonHandle[skeletonAnimation], true, false);
-					DrawCircle(m_ePosX[i][j], m_ePosY[i][j], m_ePosR, GetColor(255, 0, 0), false);
 
 					if (dFlag[i][j] == true)
 					{
@@ -1985,33 +2046,56 @@ void enemy::draw()
 						if (Death % 5 == 0)
 						{
 							deathAnimation++;
-
+							Death = 0;
 							if (deathAnimation == 4)
 							{
 								deathAnimation = 0;
 								dFlag[i][j] = false;
 							}
-							Death = 0;
 						}
 					}
 				}
 
 				if (i == 4 || i == 5)
 				{
-					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 0.3, 0, m_batHandle[batAnimation], true, true);
-					DrawCircle(m_ePosX[i][j], m_ePosY[i][j], m_ePosR, GetColor(255, 0, 0), false);
+					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.0, 0, m_batHandle[batAnimation], true, true);
+
 					if (dFlag[i][j] == true)
 					{
-						dFlag[i][j] = false;
+						bDeath++;
+						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_batDeathHandle[bDeathAnimation], true, true);
+
+						if (bDeath % 5 == 0)
+						{
+							bDeathAnimation++;
+							bDeath = 0;
+							if (bDeathAnimation == 4)
+							{
+								bDeathAnimation = 0;
+								dFlag[i][j] = false;
+							}
+						}
 					}
 				}
 				if (i == 7 || i == 6)
 				{
-					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 0.3, 0, m_batHandle[batAnimation], true, false);
-					DrawCircle(m_ePosX[i][j], m_ePosY[i][j], m_ePosR, GetColor(255, 0, 0), false);
+					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.0, 0, m_batHandle[batAnimation], true, false);
+
 					if (dFlag[i][j] == true)
 					{
-						dFlag[i][j] = false;
+						bDeath++;
+						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_batDeathHandle[bDeathAnimation], true, false);
+
+						if (bDeath % 5 == 0)
+						{
+							bDeathAnimation++;
+							bDeath = 0;
+							if (bDeathAnimation == 4)
+							{
+								bDeathAnimation = 0;
+								dFlag[i][j] = false;
+							}
+						}
 					}
 				}
 
@@ -2022,8 +2106,7 @@ void enemy::draw()
 				if (i == 1 || i == 3)
 				{
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.5, 0, m_mushHandle[mushAnimation], true, true);
-					DrawCircle(m_ePosX[i][j], m_ePosY[i][j], m_ePosR, GetColor(255, 0, 0), false);
-
+					
 					if (dFlag[i][j] == true)
 					{
 						Death++;
@@ -2032,21 +2115,19 @@ void enemy::draw()
 						if (Death % 5 == 0)
 						{
 							deathAnimation++;
-
+							Death = 0;
 							if (deathAnimation == 4)
 							{
 								deathAnimation = 0;
 								dFlag[i][j] = false;
 							}
-							Death = 0;
 						}
 					}
 				}
 				if (i == 0 || i == 2)
 				{
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.5, 0, m_mushHandle[mushAnimation], true, false);
-					DrawCircle(m_ePosX[i][j], m_ePosY[i][j], m_ePosR, GetColor(255, 0, 0), false);
-
+					
 					if (dFlag[i][j] == true)
 					{
 						Death++;
@@ -2055,13 +2136,12 @@ void enemy::draw()
 						if (Death % 5 == 0)
 						{
 							deathAnimation++;
-
+							Death = 0;
 							if (deathAnimation == 4)
 							{
 								deathAnimation = 0;
 								dFlag[i][j] = false;
 							}
-							Death = 0;
 						}
 					}
 				}
@@ -2069,8 +2149,7 @@ void enemy::draw()
 				if (i == 4 || i == 5)
 				{
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 2.0, 0, m_eyeHandle[eyeAnimation], true, true);
-					DrawCircle(m_ePosX[i][j], m_ePosY[i][j], m_ePosR, GetColor(255, 0, 0), false);
-
+					
 					if (dFlag[i][j] == true)
 					{
 						Death++;
@@ -2079,21 +2158,19 @@ void enemy::draw()
 						if (Death % 5 == 0)
 						{
 							deathAnimation++;
-
+							Death = 0;
 							if (deathAnimation == 4)
 							{
 								deathAnimation = 0;
 								dFlag[i][j] = false;
 							}
-							Death = 0;
 						}
 					}
 				}
 				if (i == 7 || i == 6)
 				{
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 2.0, 0, m_eyeHandle[eyeAnimation], true, false);
-					DrawCircle(m_ePosX[i][j], m_ePosY[i][j], m_ePosR, GetColor(255, 0, 0), false);
-
+					
 					if (dFlag[i][j] == true)
 					{
 						Death++;
@@ -2102,18 +2179,27 @@ void enemy::draw()
 						if (Death % 5 == 0)
 						{
 							deathAnimation++;
-
+							Death = 0;
 							if (deathAnimation == 4)
 							{
 								deathAnimation = 0;
 								dFlag[i][j] = false;
 							}
-							Death = 0;
 						}
 					}
 				}
 			}
 		}
 	}
+	
+	DrawRotaGraph((Game::kScreenWidth + 500) / 2, 20.0f, 1.0, 0, portal1[portalAnimation], true, false);
+	DrawRotaGraph((Game::kScreenWidth + 500) / 2, Game::kScreenHeight - 20, 1.0, 0, portal1[portalAnimation], true, false);
+	DrawRotaGraph(520.0f, Game::kScreenHeight / 2, 1.0, 0, portal1[portalAnimation], true, true);
+	DrawRotaGraph(Game::kScreenWidth - 20, Game::kScreenHeight / 2, 1.0, 0, portal1[portalAnimation], true, false);
+	DrawRotaGraph(Game::kScreenWidth - 20, 20.0f, 1.0, 0, portal2[portalAnimation], true, false);
+	DrawRotaGraph(Game::kScreenWidth - 20, Game::kScreenHeight - 20, 1.0, 0, portal2[portalAnimation], true, false);
+	DrawRotaGraph(520.0f, Game::kScreenHeight - 20, 1.0, 0, portal2[portalAnimation], true, false);
+	DrawRotaGraph(520.0f, 20.0f, 1.0, 0, portal2[portalAnimation], true, true);
+
 
 }

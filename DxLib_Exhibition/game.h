@@ -14,7 +14,7 @@ namespace Game
     constexpr bool kWindowMode = false;
 #endif
     //ウィンドウ名設定
-    const char* const kTitleText = "ゲーム名";
+    const char* const kTitleText = "CaveSurviver";
     //ウィンドウサイズ
     constexpr int kScreenWidth = 1600;
     constexpr int kScreenHeight = 900;

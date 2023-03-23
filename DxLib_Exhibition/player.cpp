@@ -42,7 +42,11 @@ player::player() :
 	Bomb(0),
 	m_bombHandle(),
 	bombAnimation(0),
-	remainingBomb(0)
+	remainingBomb(0),
+	shotSound(0),
+	enemyDamageSound(0),
+	bombSound(),
+	playerHandle()
 {
 }
 
@@ -60,6 +64,13 @@ player::~player()
 	{
 		DeleteGraph(m_bombHandle[i]);
 	}
+	for (int i = 0; i < 24; i++)
+	{
+		DeleteGraph(playerHandle[i]);
+	}
+
+	DeleteSoundMem(shotSound);
+	DeleteSoundMem(enemyDamageSound);
 }
 
 void player::init()
@@ -87,9 +98,14 @@ void player::init()
 	moveFlag = true;
 
 	pHP = 3;
+	LoadDivGraph("Data/player.png", 24, 6, 4, 20, 28, playerHandle);
 	LoadDivGraph("Data/ShotEffect.png", 21, 21, 1, 100, 100, m_shotHandle);
 	LoadDivGraph("Data/HitEffect.png", 8, 8, 1, 32, 32, m_hitHandle);
 	LoadDivGraph("Data/BombEffect.png", 45, 45, 1, 64, 64, m_bombHandle);
+
+	shotSound = LoadSoundMem("Data/Sound/attack.mp3");
+	enemyDamageSound = LoadSoundMem("Data/Sound/enemyHit.mp3");
+	bombSound = LoadSoundMem("Data/Sound/bomb.mp3");
 }
 
 void player::update()
@@ -157,6 +173,7 @@ void player::shot(enemy& Enemy)
 	{
 		if (shotFlag == false)
 		{
+			PlaySoundMem(shotSound, DX_PLAYTYPE_BACK, true);
 			shotFlag = true;
 			moveFlag = false;
 		}
@@ -229,6 +246,8 @@ void player::shot(enemy& Enemy)
 		{
 			hitFlag = true;
 
+			PlaySoundMem(enemyDamageSound, DX_PLAYTYPE_BACK, true);
+
 			Enemy.dFlag[Enemy.eDirection[i]][i] = true;
 			Enemy.deathPosX[Enemy.eDirection[i]][i] = Enemy.m_ePosX[Enemy.eDirection[i]][i];
 			Enemy.deathPosY[Enemy.eDirection[i]][i] = Enemy.m_ePosY[Enemy.eDirection[i]][i];
@@ -269,6 +288,8 @@ void player::bomb(enemy& Enemy)
 			{
 				if (bombFlag == false)
 				{
+					PlaySoundMem(bombSound, DX_PLAYTYPE_BACK, true);
+
 					bombFlag = true;
 					moveFlag = false;
 					remainingBomb -= 1;
@@ -337,6 +358,8 @@ void player::bomb(enemy& Enemy)
 			{
 				hitFlag = true;
 
+				PlaySoundMem(enemyDamageSound, DX_PLAYTYPE_BACK, true);
+
 				Enemy.dFlag[Enemy.eDirection[i]][i] = true;
 				Enemy.deathPosX[Enemy.eDirection[i]][i] = Enemy.m_ePosX[Enemy.eDirection[i]][i];
 				Enemy.deathPosY[Enemy.eDirection[i]][i] = Enemy.m_ePosY[Enemy.eDirection[i]][i];
@@ -345,7 +368,6 @@ void player::bomb(enemy& Enemy)
 
 				hitPosX = m_bPosX[b];
 				hitPosY = m_bPosY[b];
-
 			}
 
 			//ボムが外に出たら
@@ -355,11 +377,11 @@ void player::bomb(enemy& Enemy)
 				bombFlag = false;
 				moveFlag = true;
 			}
-
+			
 		}
 	}
 
-	if (Enemy.deadCount % (30 * num) == 0)
+	if (Enemy.deadCount % (30 * num) == 0 && Enemy.deadCount != 0)
 	{
 		if (remainingBomb < 3)
 		{
@@ -367,12 +389,10 @@ void player::bomb(enemy& Enemy)
 			num += 1;
 		}
 	}
-
 }
 
 void player::draw(torch &Torch)
 {
-#if true
 	Shot++;
 	if (Shot % 2 == 0)
 	{
@@ -395,51 +415,78 @@ void player::draw(torch &Torch)
 		Bomb = 0;
 	}
 
-	if (prev == 0)
-	{
-		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(255, 0, 0), true);
-	}
-	else if (prev == 1)
-	{
-		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(0, 0, 255), true);
-	}
-	else if (prev == 2)
-	{
-		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(0, 255, 0), true);
-	}
-	else if (prev == 3)
-	{
-		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(255, 255, 255), true);
-	}
-	else if (prev == 4)
-	{
-		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(255, 0, 255), true);
-	}
-	else if (prev == 5)
-	{
-		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(0, 156, 209), true);
-	}
-	else if (prev == 6)
-	{
-		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(255, 255, 0), true);
-	}
-	else if (prev == 7)
-	{
-		DrawBox(m_drawPosX, m_drawPosY, m_drawPosX + 20, m_drawPosY + 20, GetColor(125, 125, 125), true);
-	}
-	
-	if (shotFlag == true)
+	if (shotFlag == true) //ショットアニメーション
 	{
 		DrawCircle(m_sPosX, m_sPosY, m_sPosR, GetColor(255, 255, 255), false);
 		DrawRotaGraph(m_sPosX, m_sPosY, 1.0, PI, m_shotHandle[shotAnimation], true, false);
 	}
-	
+
 	if (bombFlag == true)
 	{
 		for (int i = 0; i < 8; i++)
 		{
+			//ボムアニメーション
+			DrawRotaGraph(m_bPosX[i], m_bPosY[i], 1.0, bPI[i], m_bombHandle[bombAnimation], true, false);
+#ifdef _DEBUG
 			DrawCircle(m_bPosX[i], m_bPosY[i], m_sPosR, GetColor(255, 255, 255), false);
-			DrawRotaGraph(m_bPosX[i], m_bPosY[i], 1.0, bPI[i], m_bombHandle[shotAnimation], true, false);
+#endif
+		}
+	}
+
+	if (prev == 0)
+	{
+		for (int i = 18; i < 21; i++)
+		{
+			DrawRotaGraph(m_drawPosX+10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+		}
+	}
+	else if (prev == 1)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+		}
+	}
+	else if (prev == 2)
+	{
+		for (int i = 6; i < 9; i++)
+		{
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+		}
+	}
+	else if (prev == 3)
+	{
+		for (int i = 12; i < 15; i++)
+		{
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+		}
+	}
+	else if (prev == 4)
+	{
+		for (int i = 21; i < 24; i++)
+		{
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+		}
+	}
+	else if (prev == 5)
+	{
+		for (int i = 9; i < 12; i++)
+		{
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+		}
+	}
+	else if (prev == 6)
+	{
+		for (int i = 3; i < 6; i++)
+		{
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+		}
+	}
+	else if (prev == 7)
+	{
+		for (int i = 15; i < 18; i++)
+		{
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
 		}
 	}
 	
@@ -467,7 +514,7 @@ void player::draw(torch &Torch)
 		damageEffect = false;
 	}
 
-#endif
+
 }
 
 

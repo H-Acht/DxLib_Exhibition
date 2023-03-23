@@ -15,16 +15,9 @@ SceneManager::~SceneManager()
 
 void SceneManager::init()
 {
-
-#ifdef _DEBUG
-	m_pScene = new SceneMain;
-#else
 	m_pScene = new SceneTitle;
-#endif	
 
 	m_pScene->init();
-
-
 }
 
 void SceneManager::end()

@@ -33,20 +33,23 @@ public:
 	float deathPosX[DIR][ENEMY];
 	float deathPosY[DIR][ENEMY];
 	bool dFlag[DIR][ENEMY];
-
+	bool kindFlag[ENEMY];
 	
 private:
+
 	bool moveFlag[ENEMY];
-	
-	int m_batHandle[8];
+
+	int m_batHandle[4];
 	int m_eyeHandle[8];
 	int m_skeletonHandle[4];
 	int m_mushHandle[8];
 
+	int m_batDeathHandle[5];
 	int m_eyeDeathHandle[4];
 	int m_skeletonDeathHandle[4];
 	int m_mushDeathHandle[4];
 
+	
 
 	int batAnimation;
 	int Bat;
@@ -62,5 +65,17 @@ private:
 
 	int deathAnimation;
 	int Death;
+
+	int bDeathAnimation;
+
+	int bDeath;
+
+	int damageSound;
+
+	int portal1[15];
+	int portal2[15];
+
+	int Portal;
+	int portalAnimation;
 
 };

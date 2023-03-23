@@ -10,12 +10,19 @@ torch::torch() :
 	R(0),
 	G(0),
 	B(0),
-	torchCount(4)
+	torchCount(4),
+	m_torchHandle(),
+	Torch(0),
+	torchAnimation(0)
 {
 }
 
 torch::~torch()
 {
+	for (int i = 0; i < 7; i++)
+	{
+		DeleteGraph(m_torchHandle[i]);
+	}
 }
 
 void torch::init(player &Player)
@@ -38,6 +45,9 @@ void torch::init(player &Player)
 		burnFlag[i] = true;
 		m_tPosR[i] = 10;
 	}
+
+	LoadDivGraph("Data/Torch.png", 7, 7, 1, 32, 32, m_torchHandle);
+	breakSound = LoadSoundMem("Data/Sound/torch.mp3");
 }
 
 void torch::update(enemy &Enemy)
@@ -58,7 +68,7 @@ void torch::update(enemy &Enemy)
 				Enemy.deadFlag[Enemy.eDirection[j]][j] = true; // ‚½‚¢‚Ü‚Â‚É“–‚½‚Á‚½ŽžAŒ‚”j”‚ª‘‚¦‚éƒoƒO
 				Enemy.deadCount--; // ª‚Ì‰¼C³
 				burnFlag[i] = false;
-
+				PlaySoundMem(breakSound, DX_PLAYTYPE_BACK, false);
 				torchCount--;
 
 				R -= 30;
@@ -75,12 +85,27 @@ void torch::update(enemy &Enemy)
 
 void torch::draw()
 {
+	Torch++;
+	if (Torch % 5 == 0)
+	{
+		torchAnimation++;
+		if (torchAnimation == 7)
+		{
+			torchAnimation = 0;
+		}
+		Torch = 0;
+	}
+
 	for (int i = 0; i < TORCH; i++)
 	{
 		if (burnFlag[i] == true)
 		{
-			DrawBox(m_tPosX[i] -4, m_tPosY[i], m_tPosX[i]+5, m_tPosY[i] + 20, GetColor(255, 0, 0), true);
+			DrawRotaGraph(m_tPosX[i], m_tPosY[i], 1.5, 0, m_torchHandle[torchAnimation], true, false);
+
+#ifdef DEBUG
 			DrawCircle(m_tPosX[i], m_tPosY[i], m_tPosR[i], GetColor(255, 20, 20), false);
+#endif
 		}
 	}
+
 }

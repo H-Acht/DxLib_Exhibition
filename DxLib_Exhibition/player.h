@@ -46,6 +46,7 @@ private:
 	//shot
 	float m_sPosX;
 	float m_sPosY;
+
 	int m_sPosR;
 
 	bool shotFlag;
@@ -55,6 +56,8 @@ private:
 	bool bombFlag;
 	float m_bPosX[8];
 	float m_bPosY[8];
+
+	int playerHandle[24];
 
 	int m_shotHandle[21];
 	
@@ -84,4 +87,8 @@ private:
 	int num;
 
 	bool damageEffect;
+
+	int shotSound;
+	int enemyDamageSound;
+	int bombSound;
 };

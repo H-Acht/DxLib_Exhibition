@@ -36,4 +36,7 @@ private:
 	int num;
 
 	bool gameoverEffect;
+
+	int backGround[4];
+	int volume;
 };

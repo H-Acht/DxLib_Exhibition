@@ -1,6 +1,6 @@
-
 #pragma once
 #include "SceneBase.h"
+#include "game.h"
 
 class SceneGameover : public SceneBase
 {
@@ -29,8 +29,23 @@ private:
 
 	int prev;
 
-
 	bool brightFlag;
+	bool brightFlag2;
 
 	int rgb;
+
+	LPCSTR font_path;
+
+	int Font1;
+	int Font2;
+
+	int corpseHandle;
+
+	bool in;
+
+	int lightHandle;
+	int GreenHandle;
+
+	int selectSound;
+	int cursorSound;
 };

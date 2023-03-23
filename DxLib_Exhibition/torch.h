@@ -24,4 +24,9 @@ private:
 	int m_tPosY[TORCH];
 	int m_tPosR[TORCH];
 
+	int m_torchHandle[7];
+	int Torch;
+	int torchAnimation;
+
+	int breakSound;
 };
