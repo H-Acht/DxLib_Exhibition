@@ -24,6 +24,8 @@ torch::~torch()
 	{
 		DeleteGraph(m_torchHandle[i]);
 	}
+
+	DeleteSoundMem(breakSound);
 }
 
 void torch::init(player &Player)
@@ -82,10 +84,8 @@ void torch::update(enemy &Enemy)
 			m_tPosR[i] = -10;
 		}
 	}
-}
-
-void torch::draw()
-{
+	
+	//松明アニメーション
 	Torch++;
 	if (Torch % 5 == 0)
 	{
@@ -97,15 +97,16 @@ void torch::draw()
 		Torch = 0;
 	}
 
+}
+
+void torch::draw()
+{
+	
 	for (int i = 0; i < TORCH; i++)
 	{
 		if (burnFlag[i] == true)
 		{
 			DrawRotaGraph(m_tPosX[i], m_tPosY[i], 1.5, 0, m_torchHandle[torchAnimation], true, false);
-
-#ifdef DEBUG
-			DrawCircle(m_tPosX[i], m_tPosY[i], m_tPosR[i], GetColor(255, 20, 20), false);
-#endif
 		}
 	}
 

@@ -73,6 +73,7 @@ enemy::~enemy()
 void enemy::init(player &Player)
 {
 	m_ePosR = 10;
+
 	for (int i = 0; i < 3; i++)
 	{
 		moveFlag[i] = true;
@@ -92,11 +93,9 @@ void enemy::init(player &Player)
 	LoadDivGraph("Data/portal1.png", 15, 5, 3, 192, 192, portal1);
 	LoadDivGraph("Data/portal2.png", 15, 5, 3, 192, 192, portal2);
 
-
 	damageSound = LoadSoundMem("Data/Sound/damage.mp3");
 
-#if true
-
+	//エネミースポーン位置を設定
 	for (int i = 0; i < 3; i++)
 	{
 		m_ePosX[0][i] = (Game::kScreenWidth + 500) / 2;
@@ -123,37 +122,8 @@ void enemy::init(player &Player)
 		m_ePosX[7][i] = 480.0f;
 		m_ePosY[7][i] = -20.0f;
 	}
-
-#endif
-
-#if false
-
-	ePosX[0] = Game::kScreenWidth / 2;
-	ePosY[0] = -20;
-
-	ePosX[1] = Game::kScreenWidth / 2;
-	ePosY[1] = Game::kScreenHeight + 20;
-
-	ePosX[2] = -20;
-	ePosY[2] = Game::kScreenHeight / 2;
-
-	ePosX[3] = Game::kScreenWidth + 20;
-	ePosY[3] = Game::kScreenHeight / 2;
-
-	ePosX[4] = Game::kScreenWidth + 20;
-	ePosY[4] = -20;
-
-	ePosX[5] = Game::kScreenWidth + 20;
-	ePosY[5] = Game::kScreenHeight + 20;
-
-	ePosX[6] = -20;
-	ePosY[6] = Game::kScreenHeight + 20;
-
-	ePosX[7] = -20;
-	ePosY[7] = -20;
-#endif
 }
-
+//エネミーレベル1
 void enemy::update1(player &Player)
 {
 	if (moveFlag[0] == true)
@@ -175,6 +145,8 @@ void enemy::update1(player &Player)
 
 			moveFlag[0] = true;
 			deadFlag[0][0] = false;
+
+			//撃破数を増やす
 			deadCount++;
 		}
 	}
@@ -250,7 +222,7 @@ void enemy::update1(player &Player)
 	}
 
 	//プレイヤーとエネミーの当たり判定
-	float dx = static_cast<int>(Player.m_posX) - static_cast<int>(m_ePosX[eDirection[0]][0]);
+	float dx = static_cast<float>(Player.m_posX) - static_cast<float>(m_ePosX[eDirection[0]][0]);
 	float dy = Player.m_posY - m_ePosY[eDirection[0]][0];
 	float dr = dx * dx + dy * dy;
 
@@ -261,10 +233,10 @@ void enemy::update1(player &Player)
 		PlaySoundMem(damageSound, DX_PLAYTYPE_BACK, true);
 		deadFlag[eDirection[0]][0] = true;// ここでプレイヤーにぶつかった際に撃破数が増える、要修正
 		deadCount--;// ↑の仮修正
-		Player.damageFlag = true;
+		Player.m_damageFlag = true;
 	}
 }
-
+//エネミーレベル2
 void enemy::update2(player& Player)
 {
 	if (moveFlag[0] == true)
@@ -429,11 +401,11 @@ void enemy::update2(player& Player)
 
 		deadFlag[eDirection[0]][0] = true;// ここでプレイヤーにぶつかった際に撃破数が増える、要修正
 		deadCount--;// ↑の仮修正
-		Player.damageFlag = true;
+		Player.m_damageFlag = true;
 	}
 
 }
-
+//エネミーレベル3
 void enemy::update3(player& Player)
 {
 	for (int i = 0; i < 8; i++)
@@ -650,10 +622,10 @@ void enemy::update3(player& Player)
 
 		deadFlag[eDirection[0]][0] = true;
 		deadCount--;
-		Player.damageFlag = true;
+		Player.m_damageFlag = true;
 	}
 }
-
+//エネミーレベル4
 void enemy::update4(player& Player)
 {
 	for (int i = 0; i < 8; i++)
@@ -875,10 +847,10 @@ void enemy::update4(player& Player)
 
 		deadFlag[eDirection[0]][0] = true;
 		deadCount--;
-		Player.damageFlag = true;
+		Player.m_damageFlag = true;
 	}
 }
-
+//エネミーレベル5
 void enemy::update5(player& Player)
 {
 	for (int i = 0; i < 8; i++)
@@ -1306,11 +1278,11 @@ void enemy::update5(player& Player)
 
 			deadFlag[eDirection[i]][i] = true;
 			deadCount--;
-			Player.damageFlag = true;
+			Player.m_damageFlag = true;
 		}
 	}
 }
-
+//エネミーレベル6
 void enemy::update6(player& Player)
 {
 	for (int i = 0; i < 8; i++)
@@ -1945,13 +1917,14 @@ void enemy::update6(player& Player)
 
 			deadFlag[eDirection[i]][i] = true;
 			deadCount--;
-			Player.damageFlag = true;
+			Player.m_damageFlag = true;
 		}
 	}
 }
 
 void enemy::draw()
 {
+	//蝙蝠アニメーション
 	Bat++;
 	if (Bat % 6 == 0)
 	{
@@ -1963,6 +1936,7 @@ void enemy::draw()
 		}
 	}
 
+	//目玉アニメーション
 	Eye++;
 	if (Eye % 3 == 0)
 	{
@@ -1974,6 +1948,7 @@ void enemy::draw()
 		}
 	}
 
+	//骸骨アニメーション
 	Skeleton++;
 	if (Skeleton % 10 == 0)
 	{
@@ -1985,6 +1960,7 @@ void enemy::draw()
 		}
 	}
 
+	//キノコアニメーション
 	Mush++;
 	if (Mush % 5 == 0)
 	{
@@ -1996,6 +1972,7 @@ void enemy::draw()
 		}
 	}
 
+	//ポータルアニメーション
 	Portal++;
 	if (Portal % 3 == 0)
 	{
@@ -2011,15 +1988,20 @@ void enemy::draw()
 	{
 		for (int j = 0; j < 3; j++)
 		{
+			//エネミーの種類が0の場合（骸骨、蝙蝠）
 			if (enemyKinds[j] == 0)
 			{
+				//下、右
 				if (i == 1 || i == 3)
 				{
+					//骸骨
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.5, 0, m_skeletonHandle[skeletonAnimation], true, true);
-
+					
+					//骸骨が死亡した場合
 					if (dFlag[i][j] == true)
 					{
 						Death++;
+						//死亡アニメーション
 						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_skeletonDeathHandle[deathAnimation], true, true);
 
 						if (Death % 5 == 0)
@@ -2034,13 +2016,17 @@ void enemy::draw()
 						}
 					}
 				}
+				//上、左
 				if (i == 0 || i == 2)
 				{
+					//骸骨
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.5, 0, m_skeletonHandle[skeletonAnimation], true, false);
 
+					//骸骨が死亡した場合
 					if (dFlag[i][j] == true)
 					{
 						Death++;
+						//死亡アニメーション
 						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_skeletonDeathHandle[deathAnimation], true, false);
 
 						if (Death % 5 == 0)
@@ -2055,14 +2041,17 @@ void enemy::draw()
 						}
 					}
 				}
-
+				//右上、右下
 				if (i == 4 || i == 5)
 				{
+					//蝙蝠
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.0, 0, m_batHandle[batAnimation], true, true);
-
+					
+					//蝙蝠が死亡した場合
 					if (dFlag[i][j] == true)
 					{
 						bDeath++;
+						//死亡アニメーション
 						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_batDeathHandle[bDeathAnimation], true, true);
 
 						if (bDeath % 5 == 0)
@@ -2077,13 +2066,17 @@ void enemy::draw()
 						}
 					}
 				}
-				if (i == 7 || i == 6)
+				//左下、左上
+				if (i == 6 || i == 7)
 				{
+					//蝙蝠
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.0, 0, m_batHandle[batAnimation], true, false);
-
+					
+					//蝙蝠が死亡した場合
 					if (dFlag[i][j] == true)
 					{
 						bDeath++;
+						//死亡アニメーション
 						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_batDeathHandle[bDeathAnimation], true, false);
 
 						if (bDeath % 5 == 0)
@@ -2098,18 +2091,21 @@ void enemy::draw()
 						}
 					}
 				}
-
-
 			}
+			//エネミーの種類が1の場合（キノコ、目玉）
 			else if (enemyKinds[j] == 1)
 			{
+				//下、右
 				if (i == 1 || i == 3)
 				{
+					//キノコ
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.5, 0, m_mushHandle[mushAnimation], true, true);
 					
+					//キノコが死亡した場合
 					if (dFlag[i][j] == true)
 					{
 						Death++;
+						//死亡アニメーション
 						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_mushDeathHandle[deathAnimation], true, true);
 
 						if (Death % 5 == 0)
@@ -2124,13 +2120,17 @@ void enemy::draw()
 						}
 					}
 				}
+				//下、左
 				if (i == 0 || i == 2)
 				{
+					//キノコ
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 1.5, 0, m_mushHandle[mushAnimation], true, false);
 					
+					//キノコが死亡した場合
 					if (dFlag[i][j] == true)
 					{
 						Death++;
+						//死亡アニメーション
 						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_mushDeathHandle[deathAnimation], true, false);
 
 						if (Death % 5 == 0)
@@ -2145,14 +2145,17 @@ void enemy::draw()
 						}
 					}
 				}
-
+				//右上、右下
 				if (i == 4 || i == 5)
 				{
+					//目玉
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 2.0, 0, m_eyeHandle[eyeAnimation], true, true);
 					
+					//目玉が死亡した場合
 					if (dFlag[i][j] == true)
 					{
 						Death++;
+						//死亡アニメーション
 						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_eyeDeathHandle[deathAnimation], true, true);
 
 						if (Death % 5 == 0)
@@ -2167,13 +2170,17 @@ void enemy::draw()
 						}
 					}
 				}
-				if (i == 7 || i == 6)
+				//左下、左上
+				if (i == 6 || i == 7)
 				{
+					//目玉
 					DrawRotaGraph(m_ePosX[i][j], m_ePosY[i][j], 2.0, 0, m_eyeHandle[eyeAnimation], true, false);
 					
+					//目玉が死亡した場合
 					if (dFlag[i][j] == true)
 					{
 						Death++;
+						//死亡アニメーション
 						DrawRotaGraph(deathPosX[i][j], deathPosY[i][j], 1.5, 0, m_eyeDeathHandle[deathAnimation], true, false);
 
 						if (Death % 5 == 0)
@@ -2192,6 +2199,7 @@ void enemy::draw()
 		}
 	}
 	
+	//ポータルアニメーション
 	DrawRotaGraph((Game::kScreenWidth + 500) / 2, 20.0f, 1.0, 0, portal1[portalAnimation], true, false);
 	DrawRotaGraph((Game::kScreenWidth + 500) / 2, Game::kScreenHeight - 20, 1.0, 0, portal1[portalAnimation], true, false);
 	DrawRotaGraph(520.0f, Game::kScreenHeight / 2, 1.0, 0, portal1[portalAnimation], true, true);

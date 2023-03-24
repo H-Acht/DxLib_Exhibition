@@ -18,15 +18,15 @@ player::player() :
 	m_sPosR(0),
 	m_drawPosX(0),
 	m_drawPosY(0),
-	shotFlag(),
+	shotFlag(false),
 	moveFlag(false),
-	pHP(0),
-	damageFlag(false),
+	m_pHP(0),
+	m_damageFlag(false),
 	push(0),
 	m_shotHandle(),
 	Shot(0),
 	shotAnimation(0),
-	PI(0),
+	shotGraphDir(0),
 	Hit(0),
 	hitAnimation(0),
 	hitFlag(false),
@@ -36,8 +36,8 @@ player::player() :
 	bombFlag(false),
 	m_bPosX(),
 	m_bPosY(),
-	bPI(),
-	num(1),
+	bombGraphDir(),
+	m_num(1),
 	damageEffect(false),
 	Bomb(0),
 	m_bombHandle(),
@@ -46,7 +46,7 @@ player::player() :
 	shotSound(0),
 	enemyDamageSound(0),
 	bombSound(),
-	playerHandle(),
+	m_playerHandle(),
 	InputX(),
 	InputY(),
 	CrosshairX(),
@@ -71,24 +71,24 @@ player::~player()
 	}
 	for (int i = 0; i < 24; i++)
 	{
-		DeleteGraph(playerHandle[i]);
+		DeleteGraph(m_playerHandle[i]);
 	}
 
 	DeleteSoundMem(shotSound);
 	DeleteSoundMem(enemyDamageSound);
+	DeleteSoundMem(bombSound);
 }
 
 void player::init()
 {
+	//プレイヤー位置
 	m_posX = (Game::kScreenWidth + 500) / 2;
 	m_posY = Game::kScreenHeight / 2;
 	m_posR = 10;
-
 	m_drawPosX = m_posX - 10;
 	m_drawPosY = m_posY - 10;
 
-	shotFlag = false;
-	
+	//ボム残弾数
 	remainingBomb = 3;
 
 	m_sPosX = m_posX;
@@ -104,8 +104,8 @@ void player::init()
 	}
 	moveFlag = true;
 
-	pHP = 3;
-	LoadDivGraph("Data/player.png", 24, 6, 4, 20, 28, playerHandle);
+	m_pHP = 3;
+	LoadDivGraph("Data/player.png", 24, 6, 4, 20, 28, m_playerHandle);
 	LoadDivGraph("Data/ShotEffect.png", 21, 21, 1, 100, 100, m_shotHandle);
 	LoadDivGraph("Data/HitEffect.png", 8, 8, 1, 32, 32, m_hitHandle);
 	LoadDivGraph("Data/BombEffect.png", 45, 45, 1, 64, 64, m_bombHandle);
@@ -206,11 +206,34 @@ void player::update()
 		}
 	}
 
-	if (damageFlag == true)
+	if (m_damageFlag == true)
 	{
-		pHP--;
+		m_pHP--;
 		damageEffect = true;
-		damageFlag = false;
+		m_damageFlag = false;
+	}
+
+	//アニメーション
+	Shot++;
+	if (Shot % 2 == 0)
+	{
+		shotAnimation++;
+		if (shotAnimation == 21)
+		{
+			shotAnimation = 0;
+		}
+		Shot = 0;
+	}
+
+	Bomb++;
+	if (Bomb % 2 == 0)
+	{
+		bombAnimation++;
+		if (bombAnimation == 45)
+		{
+			bombAnimation = 0;
+		}
+		Bomb = 0;
 	}
 }
 
@@ -219,7 +242,7 @@ void player::shot(enemy& Enemy)
 	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 	static int push = 0;
 
-	//1ボタンでショット
+	//Aボタンでショット
 	if (padState & PAD_INPUT_1)
 	{
 		if (push == 0)
@@ -240,57 +263,58 @@ void player::shot(enemy& Enemy)
 
 	if (shotFlag == true)
 	{
+		//弾の進行方向と表示角度
 		if (prev == 0)
 		{
 			m_sPosY -= 16;
 				
-			PI = 4.7;
+			shotGraphDir = 4.7;
 		}
 		else if (prev == 1)
 		{
 			m_sPosY += 16;
 
-			PI = 1.5;
+			shotGraphDir = 1.5;
 		}
 		else if (prev == 2)
 		{
 			m_sPosX -= 16;
 
-			PI = 3.14;
+			shotGraphDir = 3.14;
 		}
 		else if (prev == 3)
 		{
 			m_sPosX += 16;
 
-			PI = 0;
+			shotGraphDir = 0;
 		}
 		else if (prev == 4)
 		{
 			m_sPosX += 16;
 			m_sPosY -= 13.091;
 
-			PI = 5.3;
+			shotGraphDir = 5.3;
 		}
 		else if (prev == 5)
 		{
 			m_sPosX += 16;
 			m_sPosY += 13.091;
 
-			PI = 0.7;
+			shotGraphDir = 0.7;
 		}
 		else if (prev == 6)
 		{
 			m_sPosX -= 16;
 			m_sPosY += 13.091;
 
-			PI = 2.3;
+			shotGraphDir = 2.3;
 		}
 		else if (prev == 7)
 		{
 			m_sPosX -= 16;
 			m_sPosY -= 13.091;
 
-			PI = 3.7;
+			shotGraphDir = 3.7;
 		}
 	}
 
@@ -341,9 +365,10 @@ void player::bomb(enemy& Enemy)
 {
 	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 
-	//2ボタンでボム
+	//ボムの残弾が0よりも多い場合
 	if (remainingBomb > 0)
 	{
+		//Bボタンでボム発射
 		if (padState & PAD_INPUT_2)
 		{
 			if (push == 0)
@@ -367,38 +392,40 @@ void player::bomb(enemy& Enemy)
 
 	if (bombFlag == true)
 	{
+		//弾の進行方向、表示角度
 		m_bPosY[0] -= 6;
-		bPI[0] = 4.7;
+		bombGraphDir[0] = 4.7;
 
 		m_bPosY[1] += 6;
-		bPI[1] = 1.5;
+		bombGraphDir[1] = 1.5;
 
 		m_bPosX[2] -= 7;
-		bPI[2] = 3.14;
+		bombGraphDir[2] = 3.14;
 
 		m_bPosX[3] += 7;
-		bPI[3] = 0;
+		bombGraphDir[3] = 0;
 
 		m_bPosX[4] += 7;
 		m_bPosY[4] -= 5.727;
-		bPI[4] = 5.3;
+		bombGraphDir[4] = 5.3;
 
 		m_bPosX[5] += 7;
 		m_bPosY[5] += 5.727;
-		bPI[5] = 0.7;
+		bombGraphDir[5] = 0.7;
 
 		m_bPosX[6] -= 7;
 		m_bPosY[6] += 5.727;
-		bPI[6] = 2.3;
+		bombGraphDir[6] = 2.3;
 
 		m_bPosX[7] -= 7;
 		m_bPosY[7] -= 5.727;
-		bPI[7] = 3.7;
+		bombGraphDir[7] = 3.7;
 	}
 	else
 	{
 		for (int i = 0; i < 8; i++)
 		{
+			//弾の位置初期化
 			m_bPosX[i] = m_posX;
 			m_bPosY[i] = m_posY;
 		}
@@ -443,43 +470,22 @@ void player::bomb(enemy& Enemy)
 		}
 	}
 
-	if (Enemy.deadCount % (30 * num) == 0 && Enemy.deadCount != 0)
+	if (Enemy.deadCount % (30 * m_num) == 0 && Enemy.deadCount != 0)
 	{
 		if (remainingBomb < 3)
 		{
-			remainingBomb += 1;
-			num += 1;
+			remainingBomb++;
+			m_num++;
 		}
 	}
 }
 
 void player::draw(torch &Torch)
 {
-	Shot++;
-	if (Shot % 2 == 0)
+	if (shotFlag == true)
 	{
-		shotAnimation++;
-		if (shotAnimation == 21)
-		{
-			shotAnimation = 0;
-		}
-		Shot = 0;
-	}
-
-	Bomb++;
-	if (Bomb % 2 == 0)
-	{
-		bombAnimation++;
-		if (bombAnimation == 45)
-		{
-			bombAnimation = 0;
-		}
-		Bomb = 0;
-	}
-
-	if (shotFlag == true) //ショットアニメーション
-	{
-		DrawRotaGraph(m_sPosX, m_sPosY, 1.0, PI, m_shotHandle[shotAnimation], true, false);
+		//ショットアニメーション
+		DrawRotaGraph(m_sPosX, m_sPosY, 1.0, shotGraphDir, m_shotHandle[shotAnimation], true, false);
 	}
 
 	if (bombFlag == true)
@@ -487,70 +493,81 @@ void player::draw(torch &Torch)
 		for (int i = 0; i < 8; i++)
 		{
 			//ボムアニメーション
-			DrawRotaGraph(m_bPosX[i], m_bPosY[i], 1.0, bPI[i], m_bombHandle[bombAnimation], true, false);
+			DrawRotaGraph(m_bPosX[i], m_bPosY[i], 1.0, bombGraphDir[i], m_bombHandle[bombAnimation], true, false);
 		}
 	}
 
+	//プレイヤー
 	if (prev == 0)
 	{
 		for (int i = 18; i < 21; i++)
 		{
-			DrawRotaGraph(m_drawPosX+10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+			//上
+			DrawRotaGraph(m_drawPosX+10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
 	else if (prev == 1)
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+			//下
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
 	else if (prev == 2)
 	{
 		for (int i = 6; i < 9; i++)
 		{
-			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+			//左
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
 	else if (prev == 3)
 	{
 		for (int i = 12; i < 15; i++)
 		{
-			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+			//右
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
 	else if (prev == 4)
 	{
 		for (int i = 21; i < 24; i++)
 		{
-			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+			//右上
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
 	else if (prev == 5)
 	{
 		for (int i = 9; i < 12; i++)
 		{
-			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+			//右下
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
 	else if (prev == 6)
 	{
 		for (int i = 3; i < 6; i++)
 		{
-			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+			//左下
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
 	else if (prev == 7)
 	{
 		for (int i = 15; i < 18; i++)
 		{
-			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, playerHandle[i], true, false);
+			//左上
+			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
 	
+	//攻撃が当たった場合
 	if (hitFlag == true)
 	{
 		Hit++;
+		//ヒットアニメーション
 		DrawRotaGraph(hitPosX, hitPosY, 2.0, 0, m_hitHandle[hitAnimation], true, false);
 		
 		if (Hit % 2 == 0)
@@ -566,12 +583,14 @@ void player::draw(torch &Torch)
 		}
 	}
 
+	//ダメージを受けた場合
 	if (damageEffect == true)
 	{
 		DrawBox(0, 0, 1600, 900, GetColor(255, 0, 0), true);
 		damageEffect = false;
 	}
 
+	//クロスヘア
 	DrawRotaGraph(CrosshairX, CrosshairY, 1.0, 0, CrosshairHandle, true, false);
 }
 

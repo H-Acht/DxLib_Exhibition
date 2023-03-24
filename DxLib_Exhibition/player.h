@@ -4,7 +4,6 @@
 class enemy;
 class torch;
 
-
 class player
 {
 public:
@@ -17,54 +16,53 @@ public:
 	void bomb(enemy& Enemy);
 	void draw(torch& Torch);
 
-
 	//プレイヤー位置
 	int m_posX;
 	int m_posY;
 	int m_posR;
 
-	//デバッグ用
 	int m_drawPosX;
 	int m_drawPosY;
 
-	bool damageFlag;
+	bool m_damageFlag;
 
-	int pHP;
+	//体力
+	int m_pHP;
+	
 	int prev;
 
+	//ボムの残弾数
 	int remainingBomb;
-
 
 private:
 	//プレイヤーの向いている方向
 	int m_dir;
 
-	//pad入力
+	//padアナログスティック入力
 	int m_inputX;
 	int m_inputY;
 
-	//shot
+	//ショット関連
 	float m_sPosX;
 	float m_sPosY;
-
 	int m_sPosR;
-
 	bool shotFlag;
-
 	bool moveFlag;
 
-	bool bombFlag;
+	//ボム関連
 	float m_bPosX[8];
 	float m_bPosY[8];
-
-	int playerHandle[24];
-
-	int m_shotHandle[21];
+	bool bombFlag;
+	int m_num;
 	
+	//グラフィックハンドル関連
+	int m_playerHandle[24];
+	int m_shotHandle[21];
 	int m_hitHandle[8];
-
 	int m_bombHandle[45];
+	int CrosshairHandle;
 
+	//アニメーション関連
 	int Shot;
 	int shotAnimation;
 
@@ -74,29 +72,30 @@ private:
 	int Hit;
 	int hitAnimation;
 
-	float PI;
-	float bPI[8];
+	//ショット、ボムの表示角度
+	float shotGraphDir;
+	float bombGraphDir[8];
 
 	int push;
 
+	//ヒット時関連
 	bool hitFlag;
-
 	float hitPosX;
 	float hitPosY;
 
-	int num;
-
 	bool damageEffect;
 
+	//サウンド関連
 	int shotSound;
 	int enemyDamageSound;
 	int bombSound;
 
+	//アナログパッドの数値
 	int InputX;
 	int InputY;
 
+	//クロスヘア
 	int CrosshairX;
 	int CrosshairY;
-
-	int CrosshairHandle;
+	
 };

@@ -18,7 +18,9 @@ SceneRule::SceneRule() :
 	backGround(),
 	bPosX1(),
 	bPosX2(),
-	m_isEnd(false)
+	m_isEnd(false),
+	num(),
+	selectSound()
 {
 	//ÉäÉ\Å[ÉXì«Ç›çûÇ›
 	font_path = "Data/KH-Dot-Hibiya-24.ttf";
@@ -40,6 +42,10 @@ SceneRule::~SceneRule()
 	{
 		DeleteGraph(stickHandle[i]);
 	}
+	for (int i = 0; i < 4; i++)
+	{
+		DeleteGraph(backGround[i]);
+	}
 
 	DeleteFontToHandle(Font1);
 	DeleteFontToHandle(Font2);
@@ -50,11 +56,7 @@ SceneRule::~SceneRule()
 		MessageBox(NULL, "remove failure", "", MB_OK);
 	}
 
-	for (int i = 0; i < 4; i++)
-	{
-		DeleteGraph(backGround[i]);
-	}
-
+	DeleteSoundMem(selectSound);
 }
 
 void SceneRule::init()

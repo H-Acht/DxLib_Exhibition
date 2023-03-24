@@ -47,21 +47,25 @@ SceneMain::~SceneMain()
 
 void SceneMain::init()
 {
+	//初期化
 	m_pPlayer->init();
 	m_pEnemy->init(*m_pPlayer);
 	m_pTorch->init(*m_pPlayer);
 	m_pScore->init();
 
+	//背景画像ロード
 	backGround[0] = LoadGraph("Data/background1.png");
 	backGround[1] = LoadGraph("Data/background2.png");
 	backGround[2] = LoadGraph("Data/background3.png");
 	backGround[3] = LoadGraph("Data/background4a.png");
 
+	//BGMロード
 	PlayMusic("Data/Sound/mainBGM.mp3", DX_PLAYTYPE_LOOP);
 }
 
 SceneBase* SceneMain::update()
 {
+	//BGMの音量 160
 	SetVolumeMusic(volume);
 
 	int padState = GetJoypadInputState(DX_INPUT_KEY_PAD1);
@@ -69,6 +73,7 @@ SceneBase* SceneMain::update()
 	switch (num)
 	{
 	case 0:
+		//画面と音量のフェードイン
 		m_pTorch->R += 5;
 		m_pTorch->G += 5;
 		m_pTorch->B += 5;
@@ -79,45 +84,48 @@ SceneBase* SceneMain::update()
 		}
 		break;
 	case 1:
+		//アップデート
 		m_pPlayer->update();
 		m_pPlayer->shot(*m_pEnemy);
 		m_pPlayer->bomb(*m_pEnemy);
 		m_pTorch->update(*m_pEnemy);
 		m_pScore->update();
 
-		if (m_pEnemy->deadCount < 10)
+		if (m_pEnemy->deadCount < 10)	//レベル1
 		{
 			m_pEnemy->update1(*m_pPlayer);	//上左右、右上、左上
 			m_pScore->Level = 1;
 		}
-		if (m_pEnemy->deadCount >= 10 && m_pEnemy->deadCount < 20)
+		if (m_pEnemy->deadCount >= 10 && m_pEnemy->deadCount < 20)	//レベル2
 		{
 			m_pEnemy->update2(*m_pPlayer);  //八方向
 			m_pScore->Level = 2;
 		}
-		if (m_pEnemy->deadCount >= 20 && m_pEnemy->deadCount < 30)
+		if (m_pEnemy->deadCount >= 20 && m_pEnemy->deadCount < 30)	//レベル3
 		{
 			m_pEnemy->update3(*m_pPlayer); //上下左右から確率で早い敵
 			m_pScore->Level = 3;
 		}
-		if (m_pEnemy->deadCount >= 30 && m_pEnemy->deadCount < 40)
+		if (m_pEnemy->deadCount >= 30 && m_pEnemy->deadCount < 40)	//レベル4
 		{
 			m_pEnemy->update4(*m_pPlayer); //八方向から確率で早い敵
 			m_pScore->Level = 4;
 		}
-		if (m_pEnemy->deadCount >= 40 && m_pEnemy->deadCount < 90)
+		if (m_pEnemy->deadCount >= 40 && m_pEnemy->deadCount < 90)	//レベル5
 		{
 			m_pEnemy->update5(*m_pPlayer); //八方向から敵が二体同時に向かってくる
 			m_pScore->Level = 5;
 		}
-		if (m_pEnemy->deadCount >= 90 && m_pEnemy->deadCount < 150)
+		if (m_pEnemy->deadCount >= 90 && m_pEnemy->deadCount < 150)	//レベル6
 		{
 			m_pEnemy->update6(*m_pPlayer); //八方向から敵が三体同時に向かってくる
 			m_pScore->Level = 6;
 		}
 
+		//撃破数が150になった場合
 		if (m_pEnemy->deadCount >= 150)
 		{
+			//画面と音量のフェードアウト
 			m_pTorch->R -= 5;
 			m_pTorch->G -= 5;
 			m_pTorch->B -= 5;
@@ -125,14 +133,16 @@ SceneBase* SceneMain::update()
 			if (m_pTorch->R <= 0 && m_pTorch->G <= 0 && m_pTorch->B <= 0)
 			{
 				StopMusic();
-				return (new SceneClear);
+				return (new SceneClear);		//ゲームクリア
 			}
 		}
 
-		if (m_pPlayer->pHP == 0)
+		//プレイヤーの体力が0以下になった場合
+		if (m_pPlayer->m_pHP <= 0)
 		{
 			gameoverEffect = true;
 
+			//画面と音量のフェードアウト
 			m_pTorch->R -= 4;
 			m_pTorch->G -= 4;
 			m_pTorch->B -= 4;
@@ -141,12 +151,14 @@ SceneBase* SceneMain::update()
 			{
 				StopMusic();
 				gameoverEffect = false;
-				return (new SceneGameover);
+				return (new SceneGameover);		//ゲームオーバー
 			}
 		}
 
+		//松明の数が0になった場合
 		if(m_pTorch->torchCount == 0)
 		{
+			//画面と音量のフェードアウト
 			m_pTorch->R -= 4;
 			m_pTorch->G -= 4;
 			m_pTorch->B -= 4;
@@ -154,7 +166,7 @@ SceneBase* SceneMain::update()
 			if (m_pTorch->R <= 0 && m_pTorch->G <= 0 && m_pTorch->B <= 0)
 			{
 				StopMusic();
-				return (new SceneGameover);
+				return (new SceneGameover);		//ゲームオーバー
 			}
 		}
 

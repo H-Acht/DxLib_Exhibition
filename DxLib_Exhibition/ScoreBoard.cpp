@@ -75,6 +75,8 @@ ScoreBoard::~ScoreBoard()
 
 	DeleteFontToHandle(Font1);
 	DeleteFontToHandle(Font2);
+	DeleteFontToHandle(Font3);
+
 
 	if (RemoveFontResourceEx(font_path, FR_PRIVATE, NULL)) {
 	}
@@ -204,7 +206,7 @@ void ScoreBoard::draw(player& Player, enemy& Enemy, torch& Torch)
 		DrawString(20, 40, "ç∂è„", GetColor(255, 255, 255), true);
 	}
 
-	DrawFormatString(20, 60, GetColor(255, 255, 255), "HP = %d", Player.pHP);
+	DrawFormatString(20, 60, GetColor(255, 255, 255), "HP = %d", Player.m_pHP);
 
 	DrawFormatString(20, 80, GetColor(255, 255, 255), "eDirection[0] = %d", Enemy.eDirection[0]);
 
@@ -218,7 +220,7 @@ void ScoreBoard::draw(player& Player, enemy& Enemy, torch& Torch)
 
 	DrawFormatString(20, 180, GetColor(255, 255, 255), "RGB = %d, %d, %d", Torch.R, Torch.G, Torch.B);
 
-	DrawFormatStringToHandle(200, 800, GetColor(255, 0, 0), Font1, "HP -> %d", Player.pHP);
+	DrawFormatStringToHandle(200, 800, GetColor(255, 0, 0), Font1, "HP -> %d", Player.m_pHP);
 
 #endif
 
@@ -304,19 +306,19 @@ void ScoreBoard::draw(player& Player, enemy& Enemy, torch& Torch)
 	DrawRotaGraph(400, 550, 3.0, 0, buttonHandle[3], true, false);	//BÉ{É^Éì
 	DrawRotaGraph(395, 620, 4.0, 0, numHandle[Player.remainingBomb], true, false); //É{ÉÄêî
 	
-	if (Player.pHP == 3)
+	if (Player.m_pHP == 3)
 	{
 		DrawRotaGraph(150 - 48, 800, extend, 0, HPHandle, true, false);
 		DrawRotaGraph(300 - 48, 800, extend, 0, HPHandle, true, false);
 		DrawRotaGraph(450 - 48, 800, extend, 0, HPHandle, true, false);
 	}
-	else if (Player.pHP == 2)
+	else if (Player.m_pHP == 2)
 	{
 		DrawRotaGraph(150 - 48, 800, extend, 0, HPHandle, true, false);
 		DrawRotaGraph(300 - 48, 800, extend, 0, HPHandle, true, false);
 		DrawRotaGraph(450 - 48, 800, 1.0, 0, emptyHPHandle, true, false);
 	}
-	else if (Player.pHP == 1)
+	else if (Player.m_pHP == 1)
 	{
 		DrawRotaGraph(150 - 48, 800, extend, 0, HPHandle, true, false);
 		DrawRotaGraph(300 - 48, 800, 1.0, 0, emptyHPHandle, true, false);
