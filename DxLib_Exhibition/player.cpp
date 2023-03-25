@@ -127,7 +127,7 @@ void player::update()
 		if (padState & PAD_INPUT_UP)
 		{
 			m_dir = 0;
-			prev = m_dir;
+			//prev = m_dir;
 
 			CrosshairX = m_posX;
 			CrosshairY = m_posY - 70;
@@ -135,7 +135,7 @@ void player::update()
 		if (padState & PAD_INPUT_DOWN)
 		{
 			m_dir = 1;
-			prev = m_dir;
+			//prev = m_dir;
 
 			CrosshairX = m_posX;
 			CrosshairY = m_posY + 70;
@@ -144,7 +144,7 @@ void player::update()
 		if (padState & PAD_INPUT_LEFT)
 		{
 			m_dir = 2;
-			prev = m_dir;
+			//prev = m_dir;
 
 			CrosshairX = m_posX - 70;
 			CrosshairY = m_posY;
@@ -153,7 +153,7 @@ void player::update()
 		if (padState & PAD_INPUT_RIGHT)
 		{
 			m_dir = 3;
-			prev = m_dir;
+			//prev = m_dir;
 
 			CrosshairX = m_posX + 70;
 			CrosshairY = m_posY;
@@ -162,7 +162,7 @@ void player::update()
 		if (padState & PAD_INPUT_UP && padState & PAD_INPUT_RIGHT)
 		{
 			m_dir = 4;
-			prev = m_dir;
+			//prev = m_dir;
 
 			CrosshairX = m_posX + 60;
 			CrosshairY = m_posY - 60;
@@ -171,7 +171,7 @@ void player::update()
 		if (padState & PAD_INPUT_DOWN && padState & PAD_INPUT_RIGHT)
 		{
 			m_dir = 5;
-			prev = m_dir;
+			//prev = m_dir;
 
 			CrosshairX = m_posX + 60;
 			CrosshairY = m_posY + 60;
@@ -179,7 +179,7 @@ void player::update()
 		if (padState & PAD_INPUT_DOWN && padState & PAD_INPUT_LEFT)
 		{
 			m_dir = 6;
-			prev = m_dir;
+			//prev = m_dir;
 
 			CrosshairX = m_posX - 60;
 			CrosshairY = m_posY + 60;
@@ -187,13 +187,12 @@ void player::update()
 		if (padState & PAD_INPUT_UP && padState & PAD_INPUT_LEFT)
 		{
 			m_dir = 7;
-			prev = m_dir;
+			//prev = m_dir;
 
 			CrosshairX = m_posX - 60;
 			CrosshairY = m_posY - 60;
 
 		}
-
 	}
 
 	if (m_damageFlag == true)
@@ -238,10 +237,10 @@ void player::shot(enemy& Enemy)
 		if (push == 0)
 		{
 			if (shotFlag == false)
-			{
+			{	
 				PlaySoundMem(shotSound, DX_PLAYTYPE_BACK, true);
 				shotFlag = true;
-				moveFlag = false;
+				//moveFlag = false;
 			}
 		}
 		push = 1;		
@@ -307,6 +306,10 @@ void player::shot(enemy& Enemy)
 			shotGraphDir = 3.7;
 		}
 	}
+	else
+	{
+		prev = m_dir;
+	}
 
 	//弾とエネミーの当たり判定
 	for (int i = 0; i < ENEMY; i++)
@@ -335,6 +338,7 @@ void player::shot(enemy& Enemy)
 
 			shotFlag = false;
 			moveFlag = true;
+
 			m_sPosX = m_posX;
 			m_sPosY = m_posY;
 		}
@@ -488,7 +492,7 @@ void player::draw(torch &Torch)
 	}
 
 	//プレイヤー
-	if (prev == 0)
+	if (m_dir == 0)
 	{
 		for (int i = 18; i < 21; i++)
 		{
@@ -496,7 +500,7 @@ void player::draw(torch &Torch)
 			DrawRotaGraph(m_drawPosX+10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
-	else if (prev == 1)
+	else if (m_dir == 1)
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -504,7 +508,7 @@ void player::draw(torch &Torch)
 			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
-	else if (prev == 2)
+	else if (m_dir == 2)
 	{
 		for (int i = 6; i < 9; i++)
 		{
@@ -512,7 +516,7 @@ void player::draw(torch &Torch)
 			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
-	else if (prev == 3)
+	else if (m_dir == 3)
 	{
 		for (int i = 12; i < 15; i++)
 		{
@@ -520,7 +524,7 @@ void player::draw(torch &Torch)
 			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
-	else if (prev == 4)
+	else if (m_dir == 4)
 	{
 		for (int i = 21; i < 24; i++)
 		{
@@ -528,7 +532,7 @@ void player::draw(torch &Torch)
 			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
-	else if (prev == 5)
+	else if (m_dir == 5)
 	{
 		for (int i = 9; i < 12; i++)
 		{
@@ -536,7 +540,7 @@ void player::draw(torch &Torch)
 			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
-	else if (prev == 6)
+	else if (m_dir == 6)
 	{
 		for (int i = 3; i < 6; i++)
 		{
@@ -544,7 +548,7 @@ void player::draw(torch &Torch)
 			DrawRotaGraph(m_drawPosX + 10, m_drawPosY, 2.0, 0, m_playerHandle[i], true, false);
 		}
 	}
-	else if (prev == 7)
+	else if (m_dir == 7)
 	{
 		for (int i = 15; i < 18; i++)
 		{

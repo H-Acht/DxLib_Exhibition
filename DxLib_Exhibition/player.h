@@ -48,6 +48,7 @@ private:
 	int m_sPosR;
 	bool shotFlag;
 	bool moveFlag;
+	
 
 	//ƒ{ƒ€ŠÖ˜A
 	float m_bPosX[8];
