@@ -124,18 +124,15 @@ void player::update()
 
 	if (moveFlag == true)
 	{
-		//è„
-		if (InputX >= -150 && InputX <= 150 && InputY <= -550 || InputX == 0 && InputY <= -400)
+		if (padState & PAD_INPUT_UP)
 		{
 			m_dir = 0;
 			prev = m_dir;
 
 			CrosshairX = m_posX;
 			CrosshairY = m_posY - 70;
-
 		}
-		//â∫
-		if (InputX >= -150 && InputX <= 150 && InputY >= 550 || InputX == 0 && InputY >= 400)
+		if (padState & PAD_INPUT_DOWN)
 		{
 			m_dir = 1;
 			prev = m_dir;
@@ -144,8 +141,7 @@ void player::update()
 			CrosshairY = m_posY + 70;
 
 		}
-		//ç∂
-		if (InputY >= -850 && InputY <= 850 && InputX <= -550 || InputY == 0 && InputX <= -400)
+		if (padState & PAD_INPUT_LEFT)
 		{
 			m_dir = 2;
 			prev = m_dir;
@@ -154,8 +150,7 @@ void player::update()
 			CrosshairY = m_posY;
 
 		}
-		//âE
-		if (InputY >= -850 && InputY <= 850 && InputX >= 550 || InputY == 0 && InputX >= 400)
+		if (padState & PAD_INPUT_RIGHT)
 		{
 			m_dir = 3;
 			prev = m_dir;
@@ -164,8 +159,7 @@ void player::update()
 			CrosshairY = m_posY;
 
 		}
-		//âEè„
-		if (InputX >= 150 && InputX <= 850 && InputY <= 0 && InputY)
+		if (padState & PAD_INPUT_UP && padState & PAD_INPUT_RIGHT)
 		{
 			m_dir = 4;
 			prev = m_dir;
@@ -174,28 +168,23 @@ void player::update()
 			CrosshairY = m_posY - 60;
 
 		}
-		//âEâ∫
-		if (InputX >= 150 && InputX <= 850 && InputY >= 0 && InputY)
+		if (padState & PAD_INPUT_DOWN && padState & PAD_INPUT_RIGHT)
 		{
 			m_dir = 5;
 			prev = m_dir;
 
 			CrosshairX = m_posX + 60;
 			CrosshairY = m_posY + 60;
-
 		}
-		//ç∂â∫
-		if (InputX <= -150 && InputX >= -850 && InputY >= 0 && InputY)
+		if (padState & PAD_INPUT_DOWN && padState & PAD_INPUT_LEFT)
 		{
 			m_dir = 6;
 			prev = m_dir;
 
 			CrosshairX = m_posX - 60;
 			CrosshairY = m_posY + 60;
-
 		}
-		//ç∂è„
-		if (InputX <= -150 && InputX >= -850 && InputY <= 0 && InputY)
+		if (padState & PAD_INPUT_UP && padState & PAD_INPUT_LEFT)
 		{
 			m_dir = 7;
 			prev = m_dir;
@@ -204,6 +193,7 @@ void player::update()
 			CrosshairY = m_posY - 60;
 
 		}
+
 	}
 
 	if (m_damageFlag == true)
